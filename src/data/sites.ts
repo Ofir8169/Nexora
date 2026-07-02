@@ -1,0 +1,32 @@
+export const sites = [
+  {
+    id: 1,
+    name: "Site North",
+    status: "Critical",
+    employees: 12,
+    vehicles: 4,
+    tasks: 18,
+    issues: 2,
+    risk: 82,
+  },
+  {
+    id: 2,
+    name: "Tel Aviv Project",
+    status: "Active",
+    employees: 8,
+    vehicles: 3,
+    tasks: 11,
+    issues: 0,
+    risk: 21,
+  },
+  {
+    id: 3,
+    name: "Haifa Yard",
+    status: "Maintenance",
+    employees: 5,
+    vehicles: 6,
+    tasks: 7,
+    issues: 1,
+    risk: 46,
+  },
+];
