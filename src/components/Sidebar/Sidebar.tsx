@@ -5,14 +5,18 @@ import {
   Truck,
   FileText,
   BarChart3,
+  RadioTower,
   Settings,
   Sparkles,
+  Users,
 } from "lucide-react";
 import { NavLink } from "react-router-dom";
 
 const menu = [
+  { icon: RadioTower, label: "Command", path: "/command-center" },
   { icon: LayoutDashboard, label: "Dashboard", path: "/" },
   { icon: ClipboardList, label: "Tasks", path: "/tasks" },
+ { icon: Users, label: "Employees", path: "/employees" },
   { icon: MapPinned, label: "Sites", path: "/sites" },
   { icon: Truck, label: "Fleet", path: "/fleet" },
   { icon: FileText, label: "Reports", path: "/reports" },

@@ -1,50 +1,46 @@
 import { useState } from "react";
 import {
-  AlertTriangle,
-  Battery,
+  Briefcase,
   CheckCircle2,
   Edit,
-  MapPin,
   Plus,
   Search,
   Trash2,
-  Truck,
-  Wrench,
+  User,
+  Users,
   X,
 } from "lucide-react";
 import { useApp } from "../../context/AppContext";
 import Badge from "../../components/ui/Badge/Badge";
 import Card from "../../components/ui/Card/Card";
 
-export default function Fleet() {
-  const { fleet, addVehicle, updateVehicle, deleteVehicle } = useApp();
+export default function Employees() {
+  const { employees, addEmployee, updateEmployee, deleteEmployee } = useApp();
 
-  const [selectedVehicle, setSelectedVehicle] = useState(fleet[0]);
+  const [selectedEmployee, setSelectedEmployee] = useState(employees[0]);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [editingVehicleId, setEditingVehicleId] = useState<number | null>(null);
+  const [editingEmployeeId, setEditingEmployeeId] = useState<number | null>(null);
   const [search, setSearch] = useState("");
 
   const [name, setName] = useState("");
-  const [type, setType] = useState("");
+  const [role, setRole] = useState("");
   const [site, setSite] = useState("");
-  const [status, setStatus] = useState("Active");
-  const [health, setHealth] = useState("90%");
-  const [issues, setIssues] = useState("0");
+  const [status, setStatus] = useState("Available");
+  const [workload, setWorkload] = useState("40");
 
-  const filteredFleet = fleet.filter((vehicle) =>
-    `${vehicle.name} ${vehicle.type} ${vehicle.site} ${vehicle.status}`
+  const filteredEmployees = employees.filter((employee) =>
+    `${employee.name} ${employee.role} ${employee.site} ${employee.status}`
       .toLowerCase()
       .includes(search.toLowerCase())
   );
 
   function resetForm() {
     setName("");
-    setType("");
+    setRole("");
     setSite("");
-    setStatus("Active");
-    setHealth("90%");
-    setIssues("0");
-    setEditingVehicleId(null);
+    setStatus("Available");
+    setWorkload("40");
+    setEditingEmployeeId(null);
     setIsModalOpen(false);
   }
 
@@ -54,56 +50,56 @@ export default function Fleet() {
   }
 
   function openEditModal() {
-    if (!selectedVehicle) return;
+    if (!selectedEmployee) return;
 
-    setEditingVehicleId(selectedVehicle.id);
-    setName(selectedVehicle.name);
-    setType(selectedVehicle.type);
-    setSite(selectedVehicle.site);
-    setStatus(selectedVehicle.status);
-    setHealth(selectedVehicle.health);
-    setIssues(String(selectedVehicle.issues));
+    setEditingEmployeeId(selectedEmployee.id);
+    setName(selectedEmployee.name);
+    setRole(selectedEmployee.role);
+    setSite(selectedEmployee.site);
+    setStatus(selectedEmployee.status);
+    setWorkload(String(selectedEmployee.workload));
     setIsModalOpen(true);
   }
 
-  function handleSaveVehicle() {
-    const vehicle = {
-      id: editingVehicleId || Date.now(),
-      name: name || "Unnamed Vehicle",
-      type: type || "Equipment",
+  function handleSaveEmployee() {
+    const employee = {
+      id: editingEmployeeId || Date.now(),
+      name: name || "Unnamed Employee",
+      role: role || "Field Operator",
       site: site || "No site",
       status,
-      health: health || "90%",
-      issues: Number(issues) || 0,
+      workload: Number(workload) || 0,
     };
 
-    if (editingVehicleId) {
-      updateVehicle(vehicle);
-      setSelectedVehicle(vehicle);
+    if (editingEmployeeId) {
+      updateEmployee(employee);
+      setSelectedEmployee(employee);
     } else {
-      addVehicle(vehicle);
-      setSelectedVehicle(vehicle);
+      addEmployee(employee);
+      setSelectedEmployee(employee);
     }
 
     resetForm();
   }
 
-  function handleDeleteVehicle() {
-    if (!selectedVehicle) return;
+  function handleDeleteEmployee() {
+    if (!selectedEmployee) return;
 
-    deleteVehicle(selectedVehicle.id);
-    const remaining = fleet.filter((vehicle) => vehicle.id !== selectedVehicle.id);
-    setSelectedVehicle(remaining[0]);
+    deleteEmployee(selectedEmployee.id);
+    const remaining = employees.filter(
+      (employee) => employee.id !== selectedEmployee.id
+    );
+    setSelectedEmployee(remaining[0]);
   }
 
   return (
     <div>
       <div className="mb-8 flex items-center justify-between">
         <div>
-          <p className="text-sm font-semibold text-blue-600">Assets</p>
-          <h1 className="mt-2 text-4xl font-bold text-slate-950">Fleet</h1>
+          <p className="text-sm font-semibold text-blue-600">People</p>
+          <h1 className="mt-2 text-4xl font-bold text-slate-950">Employees</h1>
           <p className="mt-2 text-slate-500">
-            Monitor vehicles, equipment health, open issues and operational readiness.
+            Monitor workforce, workload, availability and current site.
           </p>
         </div>
 
@@ -112,26 +108,26 @@ export default function Fleet() {
           className="flex items-center gap-2 rounded-2xl bg-slate-950 px-5 py-3 text-sm font-semibold text-white"
         >
           <Plus size={18} />
-          New Vehicle
+          New Employee
         </button>
       </div>
 
       <div className="grid gap-4 md:grid-cols-4">
-        <FleetStat icon={<Truck />} title="Total Assets" value={String(fleet.length)} />
-        <FleetStat
+        <EmployeeStat icon={<Users />} title="Total Employees" value={String(employees.length)} />
+        <EmployeeStat
           icon={<CheckCircle2 />}
-          title="Operational"
-          value={String(fleet.filter((v) => v.status === "Active").length)}
+          title="Available"
+          value={String(employees.filter((e) => e.status === "Available").length)}
         />
-        <FleetStat
-          icon={<Wrench />}
-          title="Maintenance"
-          value={String(fleet.filter((v) => v.status === "Maintenance").length)}
+        <EmployeeStat
+          icon={<Briefcase />}
+          title="Busy"
+          value={String(employees.filter((e) => e.status === "Busy").length)}
         />
-        <FleetStat
-          icon={<AlertTriangle />}
-          title="Critical"
-          value={String(fleet.filter((v) => v.status === "Critical").length)}
+        <EmployeeStat
+          icon={<User />}
+          title="High Workload"
+          value={String(employees.filter((e) => e.workload >= 80).length)}
         />
       </div>
 
@@ -140,44 +136,45 @@ export default function Fleet() {
         <input
           value={search}
           onChange={(e) => setSearch(e.target.value)}
-          placeholder="Search vehicles, sites or status..."
+          placeholder="Search employees, roles, sites or status..."
           className="w-full bg-transparent text-sm outline-none"
         />
       </div>
 
       <div className="grid gap-6 lg:grid-cols-[1fr_380px]">
         <Card>
-          {filteredFleet.length === 0 ? (
-            <p className="text-sm text-slate-500">No vehicles found.</p>
+          {filteredEmployees.length === 0 ? (
+            <p className="text-sm text-slate-500">No employees found.</p>
           ) : (
             <div className="overflow-hidden">
-              {filteredFleet.map((vehicle) => (
+              {filteredEmployees.map((employee) => (
                 <button
-                  key={vehicle.id}
-                  onClick={() => setSelectedVehicle(vehicle)}
+                  key={employee.id}
+                  onClick={() => setSelectedEmployee(employee)}
                   className="grid w-full grid-cols-5 items-center border-b border-slate-100 py-5 text-left last:border-b-0 hover:bg-slate-50"
                 >
-                  <div className="col-span-2">
-                    <p className="font-semibold text-slate-950">{vehicle.name}</p>
-                    <p className="mt-1 text-sm text-slate-500">{vehicle.type}</p>
+                  <div className="col-span-2 flex items-center gap-3">
+                    <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-blue-50 font-bold text-blue-600">
+                      {employee.name.slice(0, 1)}
+                    </div>
+
+                    <div>
+                      <p className="font-semibold text-slate-950">{employee.name}</p>
+                      <p className="mt-1 text-sm text-slate-500">{employee.role}</p>
+                    </div>
                   </div>
 
-                  <div className="flex items-center gap-2 text-sm text-slate-600">
-                    <MapPin size={16} />
-                    {vehicle.site}
-                  </div>
+                  <p className="text-sm text-slate-600">{employee.site}</p>
 
-                  <Badge color={getBadgeColor(vehicle.status)}>
-                    {vehicle.status}
+                  <Badge color={getBadgeColor(employee.status)}>
+                    {employee.status}
                   </Badge>
 
                   <div>
                     <p className="text-sm font-semibold text-slate-950">
-                      {vehicle.health}
+                      {employee.workload}%
                     </p>
-                    <p className="text-xs text-slate-500">
-                      {vehicle.issues} open issues
-                    </p>
+                    <p className="text-xs text-slate-500">workload</p>
                   </div>
                 </button>
               ))}
@@ -185,35 +182,36 @@ export default function Fleet() {
           )}
         </Card>
 
-        {selectedVehicle ? (
+        {selectedEmployee ? (
           <aside className="rounded-3xl bg-white p-6 shadow-sm ring-1 ring-slate-200">
-            <p className="text-sm font-semibold text-blue-600">Vehicle Details</p>
+            <p className="text-sm font-semibold text-blue-600">Employee Details</p>
 
-            <h2 className="mt-2 text-2xl font-bold text-slate-950">
-              {selectedVehicle.name}
-            </h2>
+            <div className="mt-4 flex items-center gap-4">
+              <div className="flex h-16 w-16 items-center justify-center rounded-3xl bg-blue-50 text-2xl font-bold text-blue-600">
+                {selectedEmployee.name.slice(0, 1)}
+              </div>
 
-            <p className="mt-2 text-sm text-slate-500">{selectedVehicle.type}</p>
+              <div>
+                <h2 className="text-2xl font-bold text-slate-950">
+                  {selectedEmployee.name}
+                </h2>
+                <p className="text-sm text-slate-500">{selectedEmployee.role}</p>
+              </div>
+            </div>
 
             <div className="mt-6 grid grid-cols-2 gap-3">
-              <Info label="Site" value={selectedVehicle.site} />
-              <Info label="Status" value={selectedVehicle.status} />
-              <Info label="Health" value={selectedVehicle.health} />
-              <Info label="Issues" value={String(selectedVehicle.issues)} />
+              <Info label="Site" value={selectedEmployee.site} />
+              <Info label="Status" value={selectedEmployee.status} />
+              <Info label="Role" value={selectedEmployee.role} />
+              <Info label="Workload" value={`${selectedEmployee.workload}%`} />
             </div>
 
             <div className="mt-7 rounded-2xl bg-slate-950 p-4 text-white">
-              <div className="flex items-center gap-2">
-                <Battery size={18} className="text-blue-400" />
-                <p className="text-sm font-semibold">AI Fleet Brief</p>
-              </div>
-
+              <p className="text-sm font-semibold">AI Workforce Insight</p>
               <p className="mt-3 text-sm leading-6 text-slate-300">
-                {selectedVehicle.status === "Critical"
-                  ? `${selectedVehicle.name} should not be deployed before inspection.`
-                  : selectedVehicle.status === "Maintenance"
-                  ? `${selectedVehicle.name} is due for maintenance.`
-                  : `${selectedVehicle.name} is operational and ready for deployment.`}
+                {selectedEmployee.workload >= 80
+                  ? `${selectedEmployee.name} has high workload. Consider redistributing tasks.`
+                  : `${selectedEmployee.name}'s workload is within a healthy range.`}
               </p>
             </div>
 
@@ -227,7 +225,7 @@ export default function Fleet() {
               </button>
 
               <button
-                onClick={handleDeleteVehicle}
+                onClick={handleDeleteEmployee}
                 className="flex items-center gap-2 rounded-2xl bg-red-600 px-4 py-3 text-sm font-semibold text-white"
               >
                 <Trash2 size={16} />
@@ -237,7 +235,7 @@ export default function Fleet() {
           </aside>
         ) : (
           <aside className="rounded-3xl bg-white p-6 text-sm text-slate-500 shadow-sm ring-1 ring-slate-200">
-            No vehicle selected.
+            No employee selected.
           </aside>
         )}
       </div>
@@ -248,10 +246,10 @@ export default function Fleet() {
             <div className="mb-6 flex items-center justify-between">
               <div>
                 <p className="text-sm font-semibold text-blue-600">
-                  {editingVehicleId ? "Edit Vehicle" : "New Vehicle"}
+                  {editingEmployeeId ? "Edit Employee" : "New Employee"}
                 </p>
                 <h2 className="mt-2 text-2xl font-bold text-slate-950">
-                  {editingVehicleId ? "Update asset" : "Create fleet asset"}
+                  {editingEmployeeId ? "Update employee" : "Create employee"}
                 </h2>
               </div>
 
@@ -268,21 +266,21 @@ export default function Fleet() {
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 className="rounded-2xl border border-slate-200 px-4 py-3 text-sm outline-none"
-                placeholder="Vehicle name"
+                placeholder="Employee name"
               />
 
               <input
-                value={type}
-                onChange={(e) => setType(e.target.value)}
+                value={role}
+                onChange={(e) => setRole(e.target.value)}
                 className="rounded-2xl border border-slate-200 px-4 py-3 text-sm outline-none"
-                placeholder="Type"
+                placeholder="Role"
               />
 
               <input
                 value={site}
                 onChange={(e) => setSite(e.target.value)}
                 className="rounded-2xl border border-slate-200 px-4 py-3 text-sm outline-none"
-                placeholder="Site"
+                placeholder="Current site"
               />
 
               <select
@@ -290,23 +288,17 @@ export default function Fleet() {
                 onChange={(e) => setStatus(e.target.value)}
                 className="rounded-2xl border border-slate-200 px-4 py-3 text-sm outline-none"
               >
-                <option>Active</option>
+                <option>Available</option>
+                <option>Busy</option>
                 <option>Maintenance</option>
-                <option>Critical</option>
+                <option>Off Duty</option>
               </select>
 
               <input
-                value={health}
-                onChange={(e) => setHealth(e.target.value)}
+                value={workload}
+                onChange={(e) => setWorkload(e.target.value)}
                 className="rounded-2xl border border-slate-200 px-4 py-3 text-sm outline-none"
-                placeholder="Health, example: 91%"
-              />
-
-              <input
-                value={issues}
-                onChange={(e) => setIssues(e.target.value)}
-                className="rounded-2xl border border-slate-200 px-4 py-3 text-sm outline-none"
-                placeholder="Open issues"
+                placeholder="Workload %"
                 type="number"
               />
             </div>
@@ -320,10 +312,10 @@ export default function Fleet() {
               </button>
 
               <button
-                onClick={handleSaveVehicle}
+                onClick={handleSaveEmployee}
                 className="rounded-2xl bg-slate-950 px-5 py-3 text-sm font-semibold text-white"
               >
-                {editingVehicleId ? "Save Changes" : "Create Vehicle"}
+                {editingEmployeeId ? "Save Changes" : "Create Employee"}
               </button>
             </div>
           </div>
@@ -333,7 +325,7 @@ export default function Fleet() {
   );
 }
 
-function FleetStat({
+function EmployeeStat({
   icon,
   title,
   value,
@@ -363,8 +355,8 @@ function Info({ label, value }: { label: string; value: string }) {
 }
 
 function getBadgeColor(status: string): "green" | "orange" | "red" | "blue" {
-  if (status === "Critical") return "red";
-  if (status === "Maintenance") return "orange";
-  if (status === "Active") return "green";
+  if (status === "Busy") return "red";
+  if (status === "Maintenance" || status === "Off Duty") return "orange";
+  if (status === "Available") return "green";
   return "blue";
 }
