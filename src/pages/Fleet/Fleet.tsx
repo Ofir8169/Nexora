@@ -4,17 +4,17 @@ import {
   Battery,
   CheckCircle2,
   Edit,
+  Fuel,
   MapPin,
   Plus,
   Search,
+  Signal,
   Trash2,
   Truck,
   Wrench,
   X,
 } from "lucide-react";
 import { useApp } from "../../context/AppContext";
-import Badge from "../../components/ui/Badge/Badge";
-import Card from "../../components/ui/Card/Card";
 
 export default function Fleet() {
   const { fleet, addVehicle, updateVehicle, deleteVehicle } = useApp();
@@ -30,6 +30,10 @@ export default function Fleet() {
   const [status, setStatus] = useState("Active");
   const [health, setHealth] = useState("90%");
   const [issues, setIssues] = useState("0");
+
+  const active = fleet.filter((v) => v.status === "Active").length;
+  const maintenance = fleet.filter((v) => v.status === "Maintenance").length;
+  const critical = fleet.filter((v) => v.status === "Critical").length;
 
   const filteredFleet = fleet.filter((vehicle) =>
     `${vehicle.name} ${vehicle.type} ${vehicle.site} ${vehicle.status}`
@@ -97,118 +101,144 @@ export default function Fleet() {
   }
 
   return (
-    <div>
-      <div className="mb-8 flex items-center justify-between">
+    <div className="pb-10 text-white">
+      <div className="mb-8 flex items-start justify-between">
         <div>
-          <p className="text-sm font-semibold text-blue-600">Assets</p>
-          <h1 className="mt-2 text-4xl font-bold text-slate-950">Fleet</h1>
-          <p className="mt-2 text-slate-500">
-            Monitor vehicles, equipment health, open issues and operational readiness.
+          <p className="text-sm font-black uppercase tracking-widest text-cyan-400">
+            Fleet Operations
+          </p>
+          <h1 className="mt-2 text-5xl font-black tracking-tight text-white">
+            Fleet Command
+          </h1>
+          <p className="mt-3 text-lg text-slate-300">
+            Monitor vehicle health, readiness, locations and critical issues.
           </p>
         </div>
 
         <button
           onClick={openCreateModal}
-          className="flex items-center gap-2 rounded-2xl bg-slate-950 px-5 py-3 text-sm font-semibold text-white"
+          className="flex items-center gap-2 rounded-2xl bg-gradient-to-r from-blue-600 to-purple-600 px-5 py-3 text-sm font-black text-white shadow-xl shadow-blue-500/20"
         >
           <Plus size={18} />
           New Vehicle
         </button>
       </div>
 
-      <div className="grid gap-4 md:grid-cols-4">
-        <FleetStat icon={<Truck />} title="Total Assets" value={String(fleet.length)} />
-        <FleetStat
-          icon={<CheckCircle2 />}
-          title="Operational"
-          value={String(fleet.filter((v) => v.status === "Active").length)}
-        />
-        <FleetStat
-          icon={<Wrench />}
-          title="Maintenance"
-          value={String(fleet.filter((v) => v.status === "Maintenance").length)}
-        />
-        <FleetStat
-          icon={<AlertTriangle />}
-          title="Critical"
-          value={String(fleet.filter((v) => v.status === "Critical").length)}
-        />
+      <div className="grid gap-5 xl:grid-cols-4">
+        <FleetKPI icon={<Truck />} title="Total Assets" value={fleet.length} note="Fleet tracked" color="blue" />
+        <FleetKPI icon={<CheckCircle2 />} title="Operational" value={active} note="Ready to deploy" color="green" />
+        <FleetKPI icon={<Wrench />} title="Maintenance" value={maintenance} note="Service required" color="orange" />
+        <FleetKPI icon={<AlertTriangle />} title="Critical" value={critical} note="Needs review" color="red" />
       </div>
 
-      <div className="my-6 flex items-center gap-3 rounded-3xl bg-white px-5 py-4 shadow-sm ring-1 ring-slate-200">
-        <Search size={18} className="text-slate-400" />
+      <div className="my-6 flex items-center gap-3 rounded-3xl border border-blue-400/30 bg-slate-900/95 px-5 py-4 shadow-2xl shadow-blue-500/10">
+        <Search size={18} className="text-cyan-400" />
         <input
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           placeholder="Search vehicles, sites or status..."
-          className="w-full bg-transparent text-sm outline-none"
+          className="w-full bg-transparent text-sm text-white outline-none placeholder:text-slate-500"
         />
       </div>
-
-      <div className="grid gap-6 lg:grid-cols-[1fr_380px]">
-        <Card>
+      <div className="grid gap-6 xl:grid-cols-[1fr_430px]">
+        <Panel title="Fleet Assets">
           {filteredFleet.length === 0 ? (
-            <p className="text-sm text-slate-500">No vehicles found.</p>
+            <p className="text-sm text-slate-400">No vehicles found.</p>
           ) : (
-            <div className="overflow-hidden">
-              {filteredFleet.map((vehicle) => (
-                <button
-                  key={vehicle.id}
-                  onClick={() => setSelectedVehicle(vehicle)}
-                  className="grid w-full grid-cols-5 items-center border-b border-slate-100 py-5 text-left last:border-b-0 hover:bg-slate-50"
-                >
-                  <div className="col-span-2">
-                    <p className="font-semibold text-slate-950">{vehicle.name}</p>
-                    <p className="mt-1 text-sm text-slate-500">{vehicle.type}</p>
-                  </div>
+            <div className="grid gap-4 md:grid-cols-2">
+              {filteredFleet.map((vehicle) => {
+                const healthNumber = Number(vehicle.health.replace("%", "")) || 0;
 
-                  <div className="flex items-center gap-2 text-sm text-slate-600">
-                    <MapPin size={16} />
-                    {vehicle.site}
-                  </div>
+                return (
+                  <button
+                    key={vehicle.id}
+                    onClick={() => setSelectedVehicle(vehicle)}
+                    className="rounded-3xl border border-white/10 bg-slate-950/70 p-5 text-left transition hover:border-blue-400/40 hover:bg-slate-900"
+                  >
+                    <div className="mb-5 flex items-center justify-between">
+                      <div className="flex items-center gap-4">
+                        <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-blue-500/20 text-blue-300">
+                          <Truck size={23} />
+                        </div>
 
-                  <Badge color={getBadgeColor(vehicle.status)}>
-                    {vehicle.status}
-                  </Badge>
+                        <div>
+                          <p className="font-black text-white">{vehicle.name}</p>
+                          <p className="mt-1 text-sm text-slate-400">
+                            {vehicle.type}
+                          </p>
+                        </div>
+                      </div>
 
-                  <div>
-                    <p className="text-sm font-semibold text-slate-950">
-                      {vehicle.health}
-                    </p>
-                    <p className="text-xs text-slate-500">
-                      {vehicle.issues} open issues
-                    </p>
-                  </div>
-                </button>
-              ))}
+                      <StatusBadge status={vehicle.status} />
+                    </div>
+
+                    <div className="flex items-center gap-2 text-sm text-slate-300">
+                      <MapPin size={16} className="text-cyan-400" />
+                      {vehicle.site}
+                    </div>
+
+                    <div className="mt-5 grid grid-cols-3 gap-3">
+                      <MiniMetric icon={<Battery size={15} />} label="Battery" value={`${Math.max(20, healthNumber - 6)}%`} />
+                      <MiniMetric icon={<Fuel size={15} />} label="Fuel" value={`${Math.max(18, healthNumber - 18)}%`} />
+                      <MiniMetric icon={<Signal size={15} />} label="LTE" value="Online" />
+                    </div>
+
+                    <div className="mt-5">
+                      <div className="mb-2 flex justify-between text-sm">
+                        <span className="text-slate-400">Health</span>
+                        <span className="font-black text-white">{vehicle.health}</span>
+                      </div>
+
+                      <div className="h-2 rounded-full bg-slate-800">
+                        <div
+                          className={`h-2 rounded-full ${
+                            vehicle.status === "Critical"
+                              ? "bg-red-400"
+                              : vehicle.status === "Maintenance"
+                              ? "bg-orange-400"
+                              : "bg-green-400"
+                          }`}
+                          style={{ width: vehicle.health }}
+                        />
+                      </div>
+                    </div>
+                  </button>
+                );
+              })}
             </div>
           )}
-        </Card>
+        </Panel>
 
         {selectedVehicle ? (
-          <aside className="rounded-3xl bg-white p-6 shadow-sm ring-1 ring-slate-200">
-            <p className="text-sm font-semibold text-blue-600">Vehicle Details</p>
+          <Panel title="Vehicle Details">
+            <p className="text-sm font-black uppercase tracking-widest text-cyan-400">
+              Selected Asset
+            </p>
 
-            <h2 className="mt-2 text-2xl font-bold text-slate-950">
+            <h2 className="mt-2 text-3xl font-black text-white">
               {selectedVehicle.name}
             </h2>
 
-            <p className="mt-2 text-sm text-slate-500">{selectedVehicle.type}</p>
+            <p className="mt-2 text-slate-400">{selectedVehicle.type}</p>
 
-            <div className="mt-6 grid grid-cols-2 gap-3">
-              <Info label="Site" value={selectedVehicle.site} />
-              <Info label="Status" value={selectedVehicle.status} />
-              <Info label="Health" value={selectedVehicle.health} />
-              <Info label="Issues" value={String(selectedVehicle.issues)} />
+            <div className="mt-5">
+              <StatusBadge status={selectedVehicle.status} />
             </div>
 
-            <div className="mt-7 rounded-2xl bg-slate-950 p-4 text-white">
-              <div className="flex items-center gap-2">
-                <Battery size={18} className="text-blue-400" />
-                <p className="text-sm font-semibold">AI Fleet Brief</p>
+            <div className="mt-6 grid grid-cols-2 gap-3">
+              <InfoDark label="Site" value={selectedVehicle.site} />
+              <InfoDark label="Status" value={selectedVehicle.status} />
+              <InfoDark label="Health" value={selectedVehicle.health} />
+              <InfoDark label="Issues" value={String(selectedVehicle.issues)} />
+            </div>
+
+            <div className="mt-7 rounded-2xl border border-cyan-400/20 bg-cyan-500/10 p-4">
+              <div className="flex items-center gap-2 text-cyan-300">
+                <Battery size={18} />
+                <p className="text-sm font-black">AI Fleet Brief</p>
               </div>
 
-              <p className="mt-3 text-sm leading-6 text-slate-300">
+              <p className="mt-3 text-sm leading-6 text-slate-200">
                 {selectedVehicle.status === "Critical"
                   ? `${selectedVehicle.name} should not be deployed before inspection.`
                   : selectedVehicle.status === "Maintenance"
@@ -220,7 +250,7 @@ export default function Fleet() {
             <div className="mt-7 flex flex-wrap gap-3">
               <button
                 onClick={openEditModal}
-                className="flex items-center gap-2 rounded-2xl bg-slate-100 px-4 py-3 text-sm font-semibold text-slate-700"
+                className="flex items-center gap-2 rounded-2xl bg-slate-800 px-4 py-3 text-sm font-black text-white hover:bg-slate-700"
               >
                 <Edit size={16} />
                 Edit
@@ -228,84 +258,62 @@ export default function Fleet() {
 
               <button
                 onClick={handleDeleteVehicle}
-                className="flex items-center gap-2 rounded-2xl bg-red-600 px-4 py-3 text-sm font-semibold text-white"
+                className="flex items-center gap-2 rounded-2xl bg-red-600 px-4 py-3 text-sm font-black text-white hover:bg-red-500"
               >
                 <Trash2 size={16} />
                 Delete
               </button>
             </div>
-          </aside>
+          </Panel>
         ) : (
-          <aside className="rounded-3xl bg-white p-6 text-sm text-slate-500 shadow-sm ring-1 ring-slate-200">
-            No vehicle selected.
-          </aside>
+          <Panel title="Vehicle Details">
+            <p className="text-sm text-slate-400">No vehicle selected.</p>
+          </Panel>
         )}
       </div>
 
-      {isModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/40 p-6">
-          <div className="w-full max-w-xl rounded-3xl bg-white p-6 shadow-xl">
+{isModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-6 backdrop-blur-sm">
+          <div className="w-full max-w-xl rounded-3xl border border-blue-400/30 bg-slate-900 p-6 shadow-2xl shadow-blue-500/20">
             <div className="mb-6 flex items-center justify-between">
               <div>
-                <p className="text-sm font-semibold text-blue-600">
+                <p className="text-sm font-black uppercase tracking-widest text-cyan-400">
                   {editingVehicleId ? "Edit Vehicle" : "New Vehicle"}
                 </p>
-                <h2 className="mt-2 text-2xl font-bold text-slate-950">
+                <h2 className="mt-2 text-2xl font-black text-white">
                   {editingVehicleId ? "Update asset" : "Create fleet asset"}
                 </h2>
               </div>
 
               <button
                 onClick={resetForm}
-                className="rounded-xl bg-slate-100 p-2 text-slate-500"
+                className="rounded-xl bg-slate-800 p-2 text-slate-300 hover:bg-slate-700"
               >
                 <X size={18} />
               </button>
             </div>
 
             <div className="grid gap-4">
-              <input
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                className="rounded-2xl border border-slate-200 px-4 py-3 text-sm outline-none"
-                placeholder="Vehicle name"
-              />
-
-              <input
-                value={type}
-                onChange={(e) => setType(e.target.value)}
-                className="rounded-2xl border border-slate-200 px-4 py-3 text-sm outline-none"
-                placeholder="Type"
-              />
-
-              <input
-                value={site}
-                onChange={(e) => setSite(e.target.value)}
-                className="rounded-2xl border border-slate-200 px-4 py-3 text-sm outline-none"
-                placeholder="Site"
-              />
+              <DarkInput value={name} onChange={setName} placeholder="Vehicle name" />
+              <DarkInput value={type} onChange={setType} placeholder="Type" />
+              <DarkInput value={site} onChange={setSite} placeholder="Site" />
 
               <select
                 value={status}
                 onChange={(e) => setStatus(e.target.value)}
-                className="rounded-2xl border border-slate-200 px-4 py-3 text-sm outline-none"
+                className="rounded-2xl border border-slate-700 bg-slate-950 px-4 py-3 text-sm text-white outline-none"
               >
                 <option>Active</option>
                 <option>Maintenance</option>
                 <option>Critical</option>
               </select>
 
-              <input
-                value={health}
-                onChange={(e) => setHealth(e.target.value)}
-                className="rounded-2xl border border-slate-200 px-4 py-3 text-sm outline-none"
-                placeholder="Health, example: 91%"
-              />
+              <DarkInput value={health} onChange={setHealth} placeholder="Health, example: 91%" />
 
               <input
                 value={issues}
                 onChange={(e) => setIssues(e.target.value)}
-                className="rounded-2xl border border-slate-200 px-4 py-3 text-sm outline-none"
+                className="rounded-2xl border border-slate-700 bg-slate-950 px-4 py-3 text-sm text-white outline-none placeholder:text-slate-500"
                 placeholder="Open issues"
                 type="number"
               />
@@ -314,14 +322,14 @@ export default function Fleet() {
             <div className="mt-6 flex justify-end gap-3">
               <button
                 onClick={resetForm}
-                className="rounded-2xl bg-slate-100 px-5 py-3 text-sm font-semibold text-slate-700"
+                className="rounded-2xl bg-slate-800 px-5 py-3 text-sm font-black text-slate-200 hover:bg-slate-700"
               >
                 Cancel
               </button>
 
               <button
                 onClick={handleSaveVehicle}
-                className="rounded-2xl bg-slate-950 px-5 py-3 text-sm font-semibold text-white"
+                className="rounded-2xl bg-gradient-to-r from-blue-600 to-purple-600 px-5 py-3 text-sm font-black text-white shadow-lg shadow-blue-500/20"
               >
                 {editingVehicleId ? "Save Changes" : "Create Vehicle"}
               </button>
@@ -333,38 +341,104 @@ export default function Fleet() {
   );
 }
 
-function FleetStat({
+function Panel({ title, children }: { title: string; children: React.ReactNode }) {
+  return (
+    <div className="rounded-3xl border border-blue-400/30 bg-slate-900/95 p-6 shadow-2xl shadow-blue-500/20">
+      <h2 className="mb-5 text-2xl font-black text-white">{title}</h2>
+      {children}
+    </div>
+  );
+}
+
+function FleetKPI({
   icon,
   title,
   value,
+  note,
+  color,
 }: {
   icon: React.ReactNode;
   title: string;
+  value: number;
+  note: string;
+  color: "blue" | "green" | "orange" | "red";
+}) {
+  const colors = {
+    blue: "border-blue-400/50 text-blue-300 shadow-blue-500/20",
+    green: "border-green-400/50 text-green-300 shadow-green-500/20",
+    orange: "border-orange-400/50 text-orange-300 shadow-orange-500/20",
+    red: "border-red-400/50 text-red-300 shadow-red-500/20",
+  };
+
+  return (
+    <div className={`rounded-3xl border bg-slate-900/95 p-6 shadow-2xl ${colors[color]}`}>
+      <div className="mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-white/10">
+        {icon}
+      </div>
+      <p className="text-lg font-bold text-white">{title}</p>
+      <p className="mt-2 text-5xl font-black text-white">{value}</p>
+      <p className="mt-2 font-black">{note}</p>
+    </div>
+  );
+}
+
+function StatusBadge({ status }: { status: string }) {
+  const color =
+    status === "Critical"
+      ? "border-red-400/40 bg-red-500/20 text-red-300"
+      : status === "Maintenance"
+      ? "border-orange-400/40 bg-orange-500/20 text-orange-300"
+      : "border-green-400/40 bg-green-500/20 text-green-300";
+
+  return (
+    <span className={`rounded-full border px-3 py-1 text-xs font-black ${color}`}>
+      {status}
+    </span>
+  );
+}
+
+function InfoDark({ label, value }: { label: string; value: string }) {
+  return (
+    <div className="rounded-2xl border border-white/10 bg-slate-950/70 p-4">
+      <p className="text-xs font-black uppercase text-slate-500">{label}</p>
+      <p className="mt-1 text-sm font-black text-white">{value}</p>
+    </div>
+  );
+}
+
+function MiniMetric({
+  icon,
+  label,
+  value,
+}: {
+  icon: React.ReactNode;
+  label: string;
   value: string;
 }) {
   return (
-    <div className="rounded-3xl bg-white p-5 shadow-sm ring-1 ring-slate-200">
-      <div className="mb-4 flex h-10 w-10 items-center justify-center rounded-2xl bg-blue-50 text-blue-600">
-        {icon}
-      </div>
-      <p className="text-sm text-slate-500">{title}</p>
-      <p className="mt-1 text-3xl font-bold text-slate-950">{value}</p>
+    <div className="rounded-2xl border border-white/10 bg-slate-950/70 p-3">
+      <div className="mb-2 text-cyan-300">{icon}</div>
+      <p className="text-xs font-black uppercase text-slate-500">{label}</p>
+      <p className="mt-1 text-xs font-black text-white">{value}</p>
     </div>
   );
 }
 
-function Info({ label, value }: { label: string; value: string }) {
+function DarkInput({
+  value,
+  onChange,
+  placeholder,
+}: {
+  value: string;
+  onChange: (value: string) => void;
+  placeholder: string;
+}) {
   return (
-    <div className="rounded-2xl bg-slate-50 p-4">
-      <p className="text-xs font-semibold uppercase text-slate-400">{label}</p>
-      <p className="mt-1 text-sm font-semibold text-slate-900">{value}</p>
-    </div>
+    <input
+      value={value}
+      onChange={(e) => onChange(e.target.value)}
+      className="rounded-2xl border border-slate-700 bg-slate-950 px-4 py-3 text-sm text-white outline-none placeholder:text-slate-500"
+      placeholder={placeholder}
+    />
   );
-}
-
-function getBadgeColor(status: string): "green" | "orange" | "red" | "blue" {
-  if (status === "Critical") return "red";
-  if (status === "Maintenance") return "orange";
-  if (status === "Active") return "green";
-  return "blue";
 }

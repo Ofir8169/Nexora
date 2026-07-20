@@ -1,6 +1,14 @@
-import { FileText, Download, Bot, CheckCircle2, AlertTriangle, Truck } from "lucide-react";
+import {
+  AlertTriangle,
+  Bot,
+  CheckCircle2,
+  Download,
+  FileText,
+  ShieldCheck,
+  Truck,
+  Users,
+} from "lucide-react";
 import { useApp } from "../../context/AppContext";
-import Card from "../../components/ui/Card/Card";
 
 export default function Reports() {
   const { tasks, fleet, sites, employees } = useApp();
@@ -12,102 +20,152 @@ export default function Reports() {
   const overloadedEmployees = employees.filter((e) => e.workload >= 80).length;
 
   return (
-    <div>
-      <div className="mb-8 flex items-center justify-between">
+    <div className="pb-10 text-white">
+      <div className="mb-8 flex items-start justify-between">
         <div>
-          <p className="text-sm font-semibold text-blue-600">Reports</p>
-          <h1 className="mt-2 text-4xl font-bold text-slate-950">Daily Report</h1>
-          <p className="mt-2 text-slate-500">
-            Auto-generated operational summary based on current data.
+          <p className="text-sm font-black uppercase tracking-widest text-cyan-400">
+            Operational Intelligence
+          </p>
+          <h1 className="mt-2 text-5xl font-black tracking-tight text-white">
+            Reports Command
+          </h1>
+          <p className="mt-3 text-lg text-slate-300">
+            AI-generated daily summary based on live operational data.
           </p>
         </div>
 
-        <button className="flex items-center gap-2 rounded-2xl bg-slate-950 px-5 py-3 text-sm font-semibold text-white">
+        <button className="flex items-center gap-2 rounded-2xl bg-gradient-to-r from-blue-600 to-purple-600 px-5 py-3 text-sm font-black text-white shadow-xl shadow-blue-500/20">
           <Download size={18} />
           Export PDF
         </button>
       </div>
 
-      <div className="grid gap-4 md:grid-cols-4">
-        <ReportStat icon={<CheckCircle2 />} title="Completed Tasks" value={String(completed)} />
-        <ReportStat icon={<FileText />} title="Open Tasks" value={String(open)} />
-        <ReportStat icon={<Truck />} title="Critical Vehicles" value={String(criticalVehicles)} />
-        <ReportStat icon={<AlertTriangle />} title="High Risk Sites" value={String(highRiskSites)} />
+      <div className="grid gap-5 xl:grid-cols-4">
+        <KPI icon={<CheckCircle2 />} title="Completed" value={completed} color="green" />
+        <KPI icon={<FileText />} title="Open Tasks" value={open} color="orange" />
+        <KPI icon={<Truck />} title="Critical Fleet" value={criticalVehicles} color="red" />
+        <KPI icon={<Users />} title="High Workload" value={overloadedEmployees} color="blue" />
       </div>
 
-      <div className="mt-6 grid gap-6 lg:grid-cols-[1fr_380px]">
-        <Card title="Operational Summary">
-          <div className="space-y-4 text-sm leading-7 text-slate-700">
-            <p>
-              Today the operation includes <strong>{tasks.length}</strong> total tasks,
-              <strong> {fleet.length}</strong> fleet assets,
-              <strong> {sites.length}</strong> active sites and
-              <strong> {employees.length}</strong> employees.
-            </p>
-
-            <p>
-              There are <strong>{open}</strong> open tasks and
-              <strong> {completed}</strong> completed tasks.
-            </p>
-
-            <p>
-              Fleet has <strong>{criticalVehicles}</strong> critical vehicles.
-              Sites include <strong>{highRiskSites}</strong> high-risk locations.
-            </p>
-
-            <p>
-              Workforce has <strong>{overloadedEmployees}</strong> employees with high workload.
-            </p>
+      <div className="mt-6 grid gap-6 xl:grid-cols-[1.3fr_0.7fr]">
+        <Panel title="Daily Operational Summary">
+          <div className="space-y-5 text-sm leading-7 text-slate-300">
+            <ReportLine text={`Current operation includes ${tasks.length} tasks, ${fleet.length} fleet assets, ${sites.length} sites and ${employees.length} employees.`} />
+            <ReportLine text={`${completed} tasks have been completed and ${open} tasks remain open.`} />
+            <ReportLine text={`${criticalVehicles} fleet assets are marked critical and require review.`} />
+            <ReportLine text={`${highRiskSites} sites are currently considered high risk.`} />
+            <ReportLine text={`${overloadedEmployees} employees are currently above recommended workload.`} />
           </div>
-        </Card>
+        </Panel>
 
-        <aside className="rounded-3xl bg-slate-950 p-6 text-white shadow-sm">
-          <div className="flex items-center gap-3">
-            <Bot className="text-blue-400" />
-            <h2 className="text-xl font-semibold">AI Report Insight</h2>
+        <Panel title="AI Report Insight">
+          <div className="mb-5 flex items-center gap-3 text-cyan-300">
+            <Bot />
+            <p className="font-black">Nexora AI</p>
           </div>
 
-          <p className="mt-4 text-sm leading-7 text-slate-300">
+          <p className="text-sm leading-7 text-slate-300">
             {criticalVehicles > 0 || highRiskSites > 0
-              ? "Operations require attention. Review critical vehicles and high-risk sites before approving tomorrow's plan."
-              : "Operations are stable. No major risks detected in the current data."}
+              ? "Operations require attention. Review critical fleet and high-risk sites before approving tomorrow's plan."
+              : "Operations are stable. No major operational risks detected in the current data."}
           </p>
 
           <div className="mt-6 space-y-3">
             <AIItem text="Review all open tasks before end of day." />
-            <AIItem text="Check workload balance across employees." />
-            <AIItem text="Verify fleet readiness before tomorrow morning." />
+            <AIItem text="Check workforce balance across sites." />
+            <AIItem text="Validate fleet readiness before next deployment." />
           </div>
-        </aside>
+        </Panel>
+      </div>
+
+      <div className="mt-6 grid gap-6 xl:grid-cols-3">
+        <Panel title="Mission Readiness">
+          <div className="flex items-center gap-3 text-green-300">
+            <ShieldCheck />
+            <p className="text-4xl font-black">
+              {Math.max(35, 100 - open * 3 - criticalVehicles * 12 - highRiskSites * 8)}%
+            </p>
+          </div>
+          <p className="mt-4 text-sm text-slate-300">
+            Estimated readiness based on open tasks, site risk and fleet status.
+          </p>
+        </Panel>
+
+        <Panel title="Fleet Summary">
+          <Summary label="Total Assets" value={fleet.length} />
+          <Summary label="Critical" value={criticalVehicles} />
+          <Summary label="Maintenance" value={fleet.filter((v) => v.status === "Maintenance").length} />
+        </Panel>
+
+        <Panel title="Risk Summary">
+          <Summary label="High Risk Sites" value={highRiskSites} />
+          <Summary label="Open Tasks" value={open} />
+          <Summary label="Overloaded Staff" value={overloadedEmployees} />
+        </Panel>
       </div>
     </div>
   );
 }
 
-function ReportStat({
+function Panel({ title, children }: { title: string; children: React.ReactNode }) {
+  return (
+    <div className="rounded-3xl border border-blue-400/30 bg-slate-900/95 p-6 shadow-2xl shadow-blue-500/20">
+      <h2 className="mb-5 text-2xl font-black text-white">{title}</h2>
+      {children}
+    </div>
+  );
+}
+
+function KPI({
   icon,
   title,
   value,
+  color,
 }: {
   icon: React.ReactNode;
   title: string;
-  value: string;
+  value: number;
+  color: "blue" | "green" | "orange" | "red";
 }) {
+  const colors = {
+    blue: "border-blue-400/50 text-blue-300",
+    green: "border-green-400/50 text-green-300",
+    orange: "border-orange-400/50 text-orange-300",
+    red: "border-red-400/50 text-red-300",
+  };
+
   return (
-    <div className="rounded-3xl bg-white p-5 shadow-sm ring-1 ring-slate-200">
-      <div className="mb-4 flex h-10 w-10 items-center justify-center rounded-2xl bg-blue-50 text-blue-600">
+    <div className={`rounded-3xl border bg-slate-900/95 p-6 shadow-xl ${colors[color]}`}>
+      <div className="mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-white/10">
         {icon}
       </div>
-      <p className="text-sm text-slate-500">{title}</p>
-      <p className="mt-1 text-3xl font-bold text-slate-950">{value}</p>
+      <p className="text-lg font-bold text-white">{title}</p>
+      <p className="mt-2 text-5xl font-black text-white">{value}</p>
+    </div>
+  );
+}
+
+function ReportLine({ text }: { text: string }) {
+  return (
+    <div className="rounded-2xl border border-white/10 bg-slate-950/70 p-4">
+      {text}
     </div>
   );
 }
 
 function AIItem({ text }: { text: string }) {
   return (
-    <div className="rounded-2xl bg-white/10 p-4 text-sm text-slate-300">
+    <div className="rounded-2xl border border-cyan-400/20 bg-cyan-500/10 p-4 text-sm text-slate-200">
       {text}
+    </div>
+  );
+}
+
+function Summary({ label, value }: { label: string; value: number }) {
+  return (
+    <div className="mb-3 flex items-center justify-between rounded-2xl border border-white/10 bg-slate-950/70 p-4">
+      <span className="text-sm text-slate-300">{label}</span>
+      <span className="text-xl font-black text-white">{value}</span>
     </div>
   );
 }

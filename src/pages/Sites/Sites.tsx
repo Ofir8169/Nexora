@@ -1,16 +1,18 @@
 import { useState } from "react";
 import {
   AlertTriangle,
+  Building2,
   Edit,
   MapPin,
   Plus,
   Search,
   Trash2,
+  Users,
+  Truck,
+  ClipboardList,
   X,
 } from "lucide-react";
 import { useApp } from "../../context/AppContext";
-import Badge from "../../components/ui/Badge/Badge";
-import Card from "../../components/ui/Card/Card";
 
 export default function Sites() {
   const { sites, addSite, updateSite, deleteSite } = useApp();
@@ -27,6 +29,11 @@ export default function Sites() {
   const [tasks, setTasks] = useState("0");
   const [issues, setIssues] = useState("0");
   const [risk, setRisk] = useState("20");
+
+  const active = sites.filter((s) => s.status === "Active").length;
+  const maintenance = sites.filter((s) => s.status === "Maintenance").length;
+  const critical = sites.filter((s) => s.status === "Critical").length;
+  const highRisk = sites.filter((s) => s.risk >= 70).length;
 
   const filteredSites = sites.filter((site) =>
     `${site.name} ${site.status}`.toLowerCase().includes(search.toLowerCase())
@@ -95,125 +102,187 @@ export default function Sites() {
   }
 
   return (
-    <div>
-      <div className="mb-8 flex items-center justify-between">
+    <div className="pb-10 text-white">
+      <div className="mb-8 flex items-start justify-between">
         <div>
-          <p className="text-sm font-semibold text-blue-600">Operations</p>
-          <h1 className="mt-2 text-4xl font-bold text-slate-950">
-            Sites Command Center
+          <p className="text-sm font-black uppercase tracking-widest text-cyan-400">
+            Site Operations
+          </p>
+          <h1 className="mt-2 text-5xl font-black tracking-tight text-white">
+            Sites Command
           </h1>
-          <p className="mt-2 text-slate-500">
+          <p className="mt-3 text-lg text-slate-300">
             Monitor sites, resources, tasks, issues and operational risk.
           </p>
         </div>
 
         <button
           onClick={openCreateModal}
-          className="flex items-center gap-2 rounded-2xl bg-slate-950 px-5 py-3 text-sm font-semibold text-white"
+          className="flex items-center gap-2 rounded-2xl bg-gradient-to-r from-blue-600 to-purple-600 px-5 py-3 text-sm font-black text-white shadow-xl shadow-blue-500/20"
         >
           <Plus size={18} />
           New Site
         </button>
       </div>
 
-      <div className="mb-6 flex items-center gap-3 rounded-3xl bg-white px-5 py-4 shadow-sm ring-1 ring-slate-200">
-        <Search size={18} className="text-slate-400" />
+      <div className="grid gap-5 xl:grid-cols-4">
+        <SiteKPI icon={<Building2 />} title="Total Sites" value={sites.length} note="Monitored sites" color="blue" />
+        <SiteKPI icon={<MapPin />} title="Active" value={active} note="Online sites" color="green" />
+        <SiteKPI icon={<AlertTriangle />} title="Maintenance" value={maintenance} note="Needs review" color="orange" />
+        <SiteKPI icon={<AlertTriangle />} title="Critical" value={critical + highRisk} note="High risk" color="red" />
+      </div>
+
+      <div className="my-6 flex items-center gap-3 rounded-3xl border border-blue-400/30 bg-slate-900/95 px-5 py-4 shadow-2xl shadow-blue-500/10">
+        <Search size={18} className="text-cyan-400" />
         <input
           value={search}
           onChange={(e) => setSearch(e.target.value)}
-          placeholder="Search sites..."
-          className="w-full bg-transparent text-sm outline-none"
+          placeholder="Search sites or status..."
+          className="w-full bg-transparent text-sm text-white outline-none placeholder:text-slate-500"
         />
       </div>
+      <div className="grid gap-6 xl:grid-cols-[1fr_430px]">
+        <Panel title="Operational Sites">
+          {filteredSites.length === 0 ? (
+            <p className="text-sm text-slate-400">No sites found.</p>
+          ) : (
+            <div className="grid gap-4 md:grid-cols-2">
+              {filteredSites.map((site) => (
+                <button
+                  key={site.id}
+                  onClick={() => setSelectedSite(site)}
+                  className="rounded-3xl border border-white/10 bg-slate-950/70 p-5 text-left transition hover:border-cyan-400/40 hover:bg-slate-900"
+                >
+                  <div className="mb-5 flex items-center justify-between">
+                    <div className="flex items-center gap-4">
+                      <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-cyan-500/20 text-cyan-300">
+                        <Building2 size={24} />
+                      </div>
 
-      <div className="grid gap-6 lg:grid-cols-[1fr_380px]">
-        <div className="grid gap-6 md:grid-cols-2">
-          {filteredSites.map((site) => (
-            <button
-              key={site.id}
-              onClick={() => setSelectedSite(site)}
-              className="rounded-3xl bg-white p-6 text-left shadow-sm ring-1 ring-slate-200 transition hover:shadow-lg"
-            >
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-3">
-                  <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-blue-50 text-blue-600">
-                    <MapPin size={20} />
+                      <div>
+                        <p className="font-black text-white">{site.name}</p>
+                        <p className="mt-1 text-sm text-slate-400">
+                          Operational Site
+                        </p>
+                      </div>
+                    </div>
+
+                    <StatusBadge status={site.status} />
                   </div>
 
-                  <div>
-                    <h2 className="text-xl font-bold text-slate-950">
-                      {site.name}
-                    </h2>
-                    <p className="text-sm text-slate-500">Operational site</p>
+                  <div className="grid grid-cols-2 gap-3">
+                    <MiniMetric
+                      icon={<Users size={15} />}
+                      label="Employees"
+                      value={String(site.employees)}
+                    />
+
+                    <MiniMetric
+                      icon={<Truck size={15} />}
+                      label="Vehicles"
+                      value={String(site.vehicles)}
+                    />
+
+                    <MiniMetric
+                      icon={<ClipboardList size={15} />}
+                      label="Tasks"
+                      value={String(site.tasks)}
+                    />
+
+                    <MiniMetric
+                      icon={<AlertTriangle size={15} />}
+                      label="Issues"
+                      value={String(site.issues)}
+                    />
                   </div>
-                </div>
 
-                <Badge color={getBadgeColor(site.status)}>
-                  {site.status}
-                </Badge>
-              </div>
+                  <div className="mt-5">
+                    <div className="mb-2 flex justify-between text-sm">
+                      <span className="text-slate-400">Risk Score</span>
+                      <span className="font-black text-white">
+                        {site.risk}%
+                      </span>
+                    </div>
 
-              <div className="mt-6 grid grid-cols-2 gap-3">
-                <Stat title="Employees" value={String(site.employees)} />
-                <Stat title="Vehicles" value={String(site.vehicles)} />
-                <Stat title="Tasks" value={String(site.tasks)} />
-                <Stat title="Risk" value={`${site.risk}%`} />
-              </div>
-
-              <div className="mt-6 rounded-2xl bg-slate-950 p-4 text-white">
-                <p className="text-sm font-semibold">AI Recommendation</p>
-                <p className="mt-2 text-sm leading-6 text-slate-300">
-                  {site.risk > 70
-                    ? "High risk. Deploy additional resources immediately."
-                    : site.issues > 0
-                    ? "Open issues detected. Review site status today."
-                    : "Operations are stable."}
-                </p>
-              </div>
-            </button>
-          ))}
-        </div>
+                    <div className="h-2 rounded-full bg-slate-800">
+                      <div
+                        className={`h-2 rounded-full ${
+                          site.risk >= 70
+                            ? "bg-red-400"
+                            : site.risk >= 40
+                            ? "bg-orange-400"
+                            : "bg-green-400"
+                        }`}
+                        style={{ width: `${site.risk}%` }}
+                      />
+                    </div>
+                  </div>
+                </button>
+              ))}
+            </div>
+          )}
+        </Panel>
 
         {selectedSite ? (
-          <aside className="rounded-3xl bg-white p-6 shadow-sm ring-1 ring-slate-200">
-            <p className="text-sm font-semibold text-blue-600">Site Details</p>
+          <Panel title="Site Details">
+            <p className="text-sm font-black uppercase tracking-widest text-cyan-400">
+              Selected Site
+            </p>
 
-            <h2 className="mt-2 text-2xl font-bold text-slate-950">
+            <h2 className="mt-2 text-3xl font-black text-white">
               {selectedSite.name}
             </h2>
 
-            <div className="mt-4">
-              <Badge color={getBadgeColor(selectedSite.status)}>
-                {selectedSite.status}
-              </Badge>
+            <div className="mt-5">
+              <StatusBadge status={selectedSite.status} />
             </div>
 
             <div className="mt-6 grid grid-cols-2 gap-3">
-              <Info label="Employees" value={String(selectedSite.employees)} />
-              <Info label="Vehicles" value={String(selectedSite.vehicles)} />
-              <Info label="Tasks" value={String(selectedSite.tasks)} />
-              <Info label="Issues" value={String(selectedSite.issues)} />
-              <Info label="Risk Score" value={`${selectedSite.risk}%`} />
-              <Info label="Status" value={selectedSite.status} />
+              <InfoDark
+                label="Employees"
+                value={String(selectedSite.employees)}
+              />
+              <InfoDark
+                label="Vehicles"
+                value={String(selectedSite.vehicles)}
+              />
+              <InfoDark
+                label="Tasks"
+                value={String(selectedSite.tasks)}
+              />
+              <InfoDark
+                label="Issues"
+                value={String(selectedSite.issues)}
+              />
+              <InfoDark
+                label="Risk"
+                value={`${selectedSite.risk}%`}
+              />
+              <InfoDark
+                label="Status"
+                value={selectedSite.status}
+              />
             </div>
 
-            <div className="mt-7 rounded-2xl bg-slate-950 p-4 text-white">
-              <div className="flex items-center gap-2">
-                <AlertTriangle size={18} className="text-blue-400" />
-                <p className="text-sm font-semibold">AI Site Brief</p>
+            <div className="mt-7 rounded-2xl border border-cyan-400/20 bg-cyan-500/10 p-4">
+              <div className="flex items-center gap-2 text-cyan-300">
+                <AlertTriangle size={18} />
+                <p className="text-sm font-black">AI Site Brief</p>
               </div>
 
-              <p className="mt-3 text-sm leading-6 text-slate-300">
+              <p className="mt-3 text-sm leading-6 text-slate-200">
                 {selectedSite.risk > 70
-                  ? `${selectedSite.name} is high risk. Increase staffing and check open issues.`
-                  : `${selectedSite.name} is currently operating within normal range.`}
+                  ? `${selectedSite.name} requires immediate operational review.`
+                  : selectedSite.issues > 0
+                  ? "Review open issues before the next mission."
+                  : "Site is healthy and mission ready."}
               </p>
             </div>
 
-            <div className="mt-7 flex flex-wrap gap-3">
+            <div className="mt-7 flex gap-3">
               <button
                 onClick={openEditModal}
-                className="flex items-center gap-2 rounded-2xl bg-slate-100 px-4 py-3 text-sm font-semibold text-slate-700"
+                className="flex items-center gap-2 rounded-2xl bg-slate-800 px-4 py-3 text-sm font-black text-white"
               >
                 <Edit size={16} />
                 Edit
@@ -221,77 +290,72 @@ export default function Sites() {
 
               <button
                 onClick={handleDeleteSite}
-                className="flex items-center gap-2 rounded-2xl bg-red-600 px-4 py-3 text-sm font-semibold text-white"
+                className="flex items-center gap-2 rounded-2xl bg-red-600 px-4 py-3 text-sm font-black text-white"
               >
                 <Trash2 size={16} />
                 Delete
               </button>
             </div>
-          </aside>
+          </Panel>
         ) : (
-          <aside className="rounded-3xl bg-white p-6 text-sm text-slate-500 shadow-sm ring-1 ring-slate-200">
-            No site selected.
-          </aside>
+          <Panel title="Site Details">
+            <p className="text-slate-400">No site selected.</p>
+          </Panel>
         )}
       </div>
-
       {isModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/40 p-6">
-          <div className="w-full max-w-xl rounded-3xl bg-white p-6 shadow-xl">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-6 backdrop-blur-sm">
+          <div className="w-full max-w-xl rounded-3xl border border-blue-400/30 bg-slate-900 p-6 shadow-2xl shadow-blue-500/20">
             <div className="mb-6 flex items-center justify-between">
               <div>
-                <p className="text-sm font-semibold text-blue-600">
+                <p className="text-sm font-black uppercase tracking-widest text-cyan-400">
                   {editingSiteId ? "Edit Site" : "New Site"}
                 </p>
-                <h2 className="mt-2 text-2xl font-bold text-slate-950">
-                  {editingSiteId ? "Update site" : "Create operational site"}
+
+                <h2 className="mt-2 text-2xl font-black text-white">
+                  {editingSiteId ? "Update operational site" : "Create new site"}
                 </h2>
               </div>
 
               <button
                 onClick={resetForm}
-                className="rounded-xl bg-slate-100 p-2 text-slate-500"
+                className="rounded-xl bg-slate-800 p-2 text-slate-300 hover:bg-slate-700"
               >
                 <X size={18} />
               </button>
             </div>
 
             <div className="grid gap-4">
-              <input
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                className="rounded-2xl border border-slate-200 px-4 py-3 text-sm outline-none"
-                placeholder="Site name"
-              />
+              <DarkInput value={name} onChange={setName} placeholder="Site name" />
 
               <select
                 value={status}
                 onChange={(e) => setStatus(e.target.value)}
-                className="rounded-2xl border border-slate-200 px-4 py-3 text-sm outline-none"
+                className="rounded-2xl border border-slate-700 bg-slate-950 px-4 py-3 text-sm text-white outline-none"
               >
                 <option>Active</option>
                 <option>Maintenance</option>
                 <option>Critical</option>
               </select>
 
-              <input value={employees} onChange={(e) => setEmployees(e.target.value)} className="rounded-2xl border border-slate-200 px-4 py-3 text-sm outline-none" placeholder="Employees" type="number" />
-              <input value={vehicles} onChange={(e) => setVehicles(e.target.value)} className="rounded-2xl border border-slate-200 px-4 py-3 text-sm outline-none" placeholder="Vehicles" type="number" />
-              <input value={tasks} onChange={(e) => setTasks(e.target.value)} className="rounded-2xl border border-slate-200 px-4 py-3 text-sm outline-none" placeholder="Tasks" type="number" />
-              <input value={issues} onChange={(e) => setIssues(e.target.value)} className="rounded-2xl border border-slate-200 px-4 py-3 text-sm outline-none" placeholder="Issues" type="number" />
-              <input value={risk} onChange={(e) => setRisk(e.target.value)} className="rounded-2xl border border-slate-200 px-4 py-3 text-sm outline-none" placeholder="Risk score" type="number" />
+              <DarkInput value={employees} onChange={setEmployees} placeholder="Employees" />
+              <DarkInput value={vehicles} onChange={setVehicles} placeholder="Vehicles" />
+              <DarkInput value={tasks} onChange={setTasks} placeholder="Tasks" />
+              <DarkInput value={issues} onChange={setIssues} placeholder="Issues" />
+              <DarkInput value={risk} onChange={setRisk} placeholder="Risk %" />
             </div>
 
             <div className="mt-6 flex justify-end gap-3">
               <button
                 onClick={resetForm}
-                className="rounded-2xl bg-slate-100 px-5 py-3 text-sm font-semibold text-slate-700"
+                className="rounded-2xl bg-slate-800 px-5 py-3 text-sm font-black text-slate-200"
               >
                 Cancel
               </button>
 
               <button
                 onClick={handleSaveSite}
-                className="rounded-2xl bg-slate-950 px-5 py-3 text-sm font-semibold text-white"
+                className="rounded-2xl bg-gradient-to-r from-blue-600 to-purple-600 px-5 py-3 text-sm font-black text-white"
               >
                 {editingSiteId ? "Save Changes" : "Create Site"}
               </button>
@@ -303,27 +367,105 @@ export default function Sites() {
   );
 }
 
-function Stat({ title, value }: { title: string; value: string }) {
+function Panel({ title, children }: { title: string; children: React.ReactNode }) {
   return (
-    <div className="rounded-2xl bg-slate-50 p-4">
-      <p className="text-xs uppercase text-slate-400">{title}</p>
-      <p className="mt-1 text-xl font-bold text-slate-900">{value}</p>
+    <div className="rounded-3xl border border-blue-400/30 bg-slate-900/95 p-6 shadow-2xl shadow-blue-500/20">
+      <h2 className="mb-5 text-2xl font-black text-white">{title}</h2>
+      {children}
     </div>
   );
 }
 
-function Info({ label, value }: { label: string; value: string }) {
+function SiteKPI({
+  icon,
+  title,
+  value,
+  note,
+  color,
+}: {
+  icon: React.ReactNode;
+  title: string;
+  value: number;
+  note: string;
+  color: "blue" | "green" | "orange" | "red";
+}) {
+  const colors = {
+    blue: "border-blue-400/50 text-blue-300",
+    green: "border-green-400/50 text-green-300",
+    orange: "border-orange-400/50 text-orange-300",
+    red: "border-red-400/50 text-red-300",
+  };
+
   return (
-    <div className="rounded-2xl bg-slate-50 p-4">
-      <p className="text-xs font-semibold uppercase text-slate-400">{label}</p>
-      <p className="mt-1 text-sm font-semibold text-slate-900">{value}</p>
+    <div className={`rounded-3xl border bg-slate-900/95 p-6 shadow-xl ${colors[color]}`}>
+      <div className="mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-white/10">
+        {icon}
+      </div>
+
+      <p className="text-lg font-bold text-white">{title}</p>
+      <p className="mt-2 text-5xl font-black text-white">{value}</p>
+      <p className="mt-2 font-black">{note}</p>
     </div>
   );
 }
 
-function getBadgeColor(status: string): "green" | "orange" | "red" | "blue" {
-  if (status === "Critical") return "red";
-  if (status === "Maintenance") return "orange";
-  if (status === "Active") return "green";
-  return "blue";
+function StatusBadge({ status }: { status: string }) {
+  const color =
+    status === "Critical"
+      ? "border-red-400/40 bg-red-500/20 text-red-300"
+      : status === "Maintenance"
+      ? "border-orange-400/40 bg-orange-500/20 text-orange-300"
+      : "border-green-400/40 bg-green-500/20 text-green-300";
+
+  return (
+    <span className={`rounded-full border px-3 py-1 text-xs font-black ${color}`}>
+      {status}
+    </span>
+  );
+}
+
+function MiniMetric({
+  icon,
+  label,
+  value,
+}: {
+  icon: React.ReactNode;
+  label: string;
+  value: string;
+}) {
+  return (
+    <div className="rounded-2xl border border-white/10 bg-slate-950/70 p-3">
+      <div className="mb-2 text-cyan-300">{icon}</div>
+      <p className="text-xs font-black uppercase text-slate-500">{label}</p>
+      <p className="mt-1 text-sm font-black text-white">{value}</p>
+    </div>
+  );
+}
+
+function InfoDark({ label, value }: { label: string; value: string }) {
+  return (
+    <div className="rounded-2xl border border-white/10 bg-slate-950/70 p-4">
+      <p className="text-xs font-black uppercase text-slate-500">{label}</p>
+      <p className="mt-1 text-sm font-black text-white">{value}</p>
+    </div>
+  );
+}
+
+function DarkInput({
+  value,
+  onChange,
+  placeholder,
+}: {
+  value: string;
+  onChange: (value: string) => void;
+  placeholder: string;
+}) {
+  return (
+    <input
+      value={value}
+      onChange={(e) => onChange(e.target.value)}
+      className="rounded-2xl border border-slate-700 bg-slate-950 px-4 py-3 text-sm text-white outline-none placeholder:text-slate-500"
+      placeholder={placeholder}
+    />
+  );
 }

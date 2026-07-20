@@ -1,0 +1,131 @@
+{
+  "customers": [
+    {
+      "id": "customer-1",
+      "name": "Alpha Industries",
+      "email": "office@alpha.co.il",
+      "phone": "03-5551234",
+      "company": "Alpha Industries",
+      "status": "Active",
+      "priority": "High",
+      "balance": 12500,
+      "notes": "Strategic customer",
+      "createdAt": "2026-07-20T08:00:00.000Z"
+    },
+    {
+      "id": "customer-2",
+      "name": "Orion Logistics",
+      "email": "finance@orion.co.il",
+      "phone": "052-5557788",
+      "company": "Orion Logistics",
+      "status": "Lead",
+      "priority": "Medium",
+      "balance": 0,
+      "notes": "Waiting for quotation",
+      "createdAt": "2026-07-20T08:00:00.000Z"
+    }
+  ],
+  "employees": [
+    {
+      "id": "employee-1",
+      "name": "Daniel Cohen",
+      "email": "daniel@nexora.local",
+      "phone": "050-1112233",
+      "role": "Operations Manager",
+      "department": "Operations",
+      "status": "Available",
+      "workload": 45,
+      "priority": 90,
+      "createdAt": "2026-07-20T08:00:00.000Z"
+    },
+    {
+      "id": "employee-2",
+      "name": "Maya Levi",
+      "email": "maya@nexora.local",
+      "phone": "052-3334455",
+      "role": "Account Manager",
+      "department": "Sales",
+      "status": "Busy",
+      "workload": 80,
+      "priority": 75,
+      "createdAt": "2026-07-20T08:00:00.000Z"
+    }
+  ],
+  "tasks": [
+    {
+      "id": "task-1",
+      "title": "Collect overdue payment",
+      "description": "Contact Alpha Industries regarding overdue invoice",
+      "customerId": "customer-1",
+      "assigneeId": "employee-2",
+      "status": "Open",
+      "urgency": 10,
+      "businessValue": 9,
+      "risk": 8,
+      "customerImportance": 9,
+      "priorityScore": 90,
+      "dueDate": "2026-07-22",
+      "createdAt": "2026-07-20T08:00:00.000Z"
+    }
+  ],
+  "invoices": [
+    {
+      "id": "invoice-1",
+      "documentNumber": "INV-1001",
+      "type": "Invoice",
+      "customerId": "customer-1",
+      "status": "Overdue",
+      "subtotal": 10000,
+      "vat": 1800,
+      "total": 11800,
+      "issueDate": "2026-06-01",
+      "dueDate": "2026-07-01",
+      "items": [
+        {
+          "id": "item-1",
+          "description": "Operations consulting",
+          "quantity": 1,
+          "unitPrice": 10000,
+          "total": 10000
+        }
+      ],
+      "createdAt": "2026-06-01T08:00:00.000Z"
+    }
+  ],
+  "expenses": [
+    {
+      "id": "expense-1",
+      "supplier": "Cloud Services",
+      "description": "Monthly software subscription",
+      "category": "Software",
+      "amount": 850,
+      "vat": 153,
+      "total": 1003,
+      "date": "2026-07-10",
+      "status": "Paid",
+      "createdAt": "2026-07-10T08:00:00.000Z"
+    }
+  ],
+  "documents": [],
+  "automations": [
+    {
+      "id": "automation-1",
+      "name": "Overdue invoice reminder",
+      "description": "Creates a task when an invoice becomes overdue",
+      "trigger": "INVOICE_OVERDUE",
+      "action": "CREATE_TASK",
+      "enabled": true,
+      "lastRun": null,
+      "createdAt": "2026-07-20T08:00:00.000Z"
+    }
+  ],
+  "activities": [
+    {
+      "id": "activity-1",
+      "type": "invoice",
+      "title": "Invoice INV-1001 created",
+      "description": "Invoice created for Alpha Industries",
+      "createdAt": "2026-07-20T08:00:00.000Z"
+    }
+  ]
+}
