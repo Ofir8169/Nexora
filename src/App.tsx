@@ -1,22 +1,36 @@
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { lazy, Suspense, type ReactNode } from "react";
+import { BrowserRouter, Navigate, Routes, Route } from "react-router-dom";
 
 import MainLayout from "./layouts/MainLayout";
 import Login from "./pages/Login/Login";
 import { BusinessProvider } from "./business/context/BusinessContext";
-import Dashboard from "./pages/Dashboard/Dashboard";
-import Tasks from "./pages/Tasks/Tasks";
-import Sites from "./pages/Sites/Sites";
-import Fleet from "./pages/Fleet/Fleet";
-import Settings from "./pages/Settings/Settings";
-import Employees from "./pages/Employees/Employees";
-import Analytics from "./pages/Analytics/Analytics";
-import Reports from "./pages/Reports/Reports";
-import CommandCenter from "./pages/CommandCenter/CommandCenter";
-import LiveMap from "./pages/LiveMap/LiveMap";
-import AICopilot from "./features/ai/AICopilot";
+import { AppProvider } from "./context/AppContext";
+import { canAccess, getUserRole } from "./lib/preferences";
+import { getAuthToken } from "./lib/auth";
+import WorkspaceSkeleton from "./components/ui-v2/WorkspaceSkeleton";
+
+const Dashboard = lazy(() => import("./pages/Dashboard/Dashboard"));
+const Workday = lazy(() => import("./pages/Workday/Workday"));
+const Tasks = lazy(() => import("./pages/Tasks/Tasks"));
+const Sites = lazy(() => import("./pages/Sites/Sites"));
+const Fleet = lazy(() => import("./pages/Fleet/Fleet"));
+const Settings = lazy(() => import("./pages/Settings/Settings"));
+const Plans = lazy(() => import("./pages/Plans/Plans"));
+const Team = lazy(() => import("./pages/Team/Team"));
+const Employees = lazy(() => import("./pages/Employees/Employees"));
+const Analytics = lazy(() => import("./pages/Analytics/Analytics"));
+const Reports = lazy(() => import("./pages/Reports/Reports"));
+const CommandCenter = lazy(
+  () => import("./pages/CommandCenter/CommandCenter")
+);
+const LiveMap = lazy(() => import("./pages/LiveMap/LiveMap"));
+const AICopilot = lazy(() => import("./features/ai/AICopilot"));
+const BusinessHub = lazy(
+  () => import("./business/pages/BusinessHub")
+);
 
 function App() {
-  const isLoggedIn = localStorage.getItem("nexora_logged_in") === "true";
+  const isLoggedIn = localStorage.getItem("nexora_logged_in") === "true" && Boolean(getAuthToken());
 
   if (!isLoggedIn) {
     return <Login />;
@@ -24,24 +38,42 @@ function App() {
 
   return (
     <BrowserRouter>
-      <MainLayout>
-        <Routes>
-          <Route path="/" element={<Dashboard />} />
-          <Route path="/command" element={<CommandCenter />} />
-          <Route path="/map" element={<LiveMap />} />
-          <Route path="/tasks" element={<Tasks />} />
-          <Route path="/sites" element={<Sites />} />
-          <Route path="/business" element={<BusinessProvider><></></BusinessProvider>} />
-          <Route path="/fleet" element={<Fleet />} />
-          <Route path="/employees" element={<Employees />} />
-          <Route path="/analytics" element={<Analytics />} />
-          <Route path="/reports" element={<Reports />} />
-          <Route path="/ai" element={<AICopilot />} />
-          <Route path="/settings" element={<Settings />} />
-        </Routes>
-      </MainLayout>
+      <AppProvider>
+        <BusinessProvider>
+          <MainLayout>
+            <Suspense fallback={<RouteFallback />}>
+              <Routes>
+                <Route path="/" element={<Dashboard />} />
+                <Route path="/work" element={<Guard path="/work"><Workday /></Guard>} />
+                <Route path="/command" element={<Guard path="/command"><CommandCenter /></Guard>} />
+                <Route path="/map" element={<Guard path="/map"><LiveMap /></Guard>} />
+                <Route path="/tasks" element={<Guard path="/tasks"><Tasks /></Guard>} />
+                <Route path="/sites" element={<Guard path="/sites"><Sites /></Guard>} />
+                <Route path="/business" element={<Guard path="/business"><BusinessHub /></Guard>} />
+                <Route path="/fleet" element={<Guard path="/fleet"><Fleet /></Guard>} />
+                <Route path="/employees" element={<Guard path="/employees"><Employees /></Guard>} />
+                <Route path="/analytics" element={<Guard path="/analytics"><Analytics /></Guard>} />
+                <Route path="/reports" element={<Guard path="/reports"><Reports /></Guard>} />
+                <Route path="/ai" element={<Guard path="/ai"><AICopilot /></Guard>} />
+                <Route path="/settings" element={<Guard path="/settings"><Settings /></Guard>} />
+                <Route path="/plans" element={<Guard path="/plans"><Plans /></Guard>} />
+                <Route path="/team" element={<Guard path="/team"><Team /></Guard>} />
+                <Route path="*" element={<Navigate to="/" replace />} />
+              </Routes>
+            </Suspense>
+          </MainLayout>
+        </BusinessProvider>
+      </AppProvider>
     </BrowserRouter>
   );
+}
+
+function Guard({ path, children }: { path: string; children: ReactNode }) {
+  return canAccess(getUserRole(), path) ? children : <Navigate to="/" replace />;
+}
+
+function RouteFallback() {
+  return <WorkspaceSkeleton />;
 }
 
 export default App;

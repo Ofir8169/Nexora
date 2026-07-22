@@ -12,29 +12,29 @@ export default function KPI({
   color?: "blue" | "green" | "orange" | "red" | "purple" | "cyan";
 }) {
   const colors = {
-    blue: "border-blue-400/40 text-blue-300",
-    green: "border-green-400/40 text-green-300",
-    orange: "border-orange-400/40 text-orange-300",
-    red: "border-red-400/40 text-red-300",
-    purple: "border-purple-400/40 text-purple-300",
-    cyan: "border-cyan-400/40 text-cyan-300",
+    blue: "text-blue-600 bg-blue-50",
+    green: "text-emerald-600 bg-emerald-50",
+    orange: "text-amber-600 bg-amber-50",
+    red: "text-red-600 bg-red-50",
+    purple: "text-violet-600 bg-violet-50",
+    cyan: "text-sky-600 bg-sky-50",
   };
 
   return (
     <div
-      className={`rounded-3xl border bg-[#0F172A]/95 p-6 shadow-xl shadow-cyan-950/20 ${colors[color]}`}
+      className="nexora-surface nexora-lift rounded-2xl p-5"
     >
-      <div className="mb-5 flex h-12 w-12 items-center justify-center rounded-2xl bg-white/10">
+      <div className={`mb-5 flex h-11 w-11 items-center justify-center rounded-xl ${colors[color]}`}>
         {icon}
       </div>
 
-      <p className="text-sm font-bold text-slate-300">{title}</p>
+      <p className="text-sm font-medium text-slate-500">{title}</p>
 
-      <p className="mt-2 text-4xl font-black tracking-tight text-white">
+      <p className="mt-1.5 text-3xl font-bold tracking-tight text-slate-950">
         {value}
       </p>
 
-      {note && <p className="mt-2 text-sm font-bold">{note}</p>}
+      {note && <p className="mt-2 text-xs font-semibold text-slate-500">{note}</p>}
     </div>
   );
 }

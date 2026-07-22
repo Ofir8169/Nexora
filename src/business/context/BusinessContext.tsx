@@ -1,13 +1,11 @@
 import {
-  createContext,
   useCallback,
-  useContext,
   useEffect,
-  useMemo,
   useState,
 } from "react";
 
 import { businessApi } from "../api/businessApi";
+import { BusinessContext } from "./business-context";
 
 import type {
   Automation,
@@ -19,81 +17,6 @@ import type {
   Expense,
   Invoice,
 } from "../types/business";
-
-interface BusinessContextValue {
-  dashboard: DashboardSummary | null;
-  customers: Customer[];
-  employees: Employee[];
-  tasks: BusinessTask[];
-  invoices: Invoice[];
-  expenses: Expense[];
-  documents: BusinessDocument[];
-  automations: Automation[];
-
-  loading: boolean;
-  error: string | null;
-
-  refreshAll: () => Promise<void>;
-  refreshDashboard: () => Promise<void>;
-
-  createCustomer: (
-    data: Partial<Customer>
-  ) => Promise<Customer>;
-
-  updateCustomer: (
-    id: string,
-    data: Partial<Customer>
-  ) => Promise<Customer>;
-
-  deleteCustomer: (id: string) => Promise<void>;
-
-  createEmployee: (
-    data: Partial<Employee>
-  ) => Promise<Employee>;
-
-  updateEmployee: (
-    id: string,
-    data: Partial<Employee>
-  ) => Promise<Employee>;
-
-  deleteEmployee: (id: string) => Promise<void>;
-
-  createTask: (
-    data: Partial<BusinessTask>
-  ) => Promise<BusinessTask>;
-
-  updateTask: (
-    id: string,
-    data: Partial<BusinessTask>
-  ) => Promise<BusinessTask>;
-
-  deleteTask: (id: string) => Promise<void>;
-
-  createInvoice: (
-    data: Partial<Invoice>
-  ) => Promise<Invoice>;
-
-  updateInvoice: (
-    id: string,
-    data: Partial<Invoice>
-  ) => Promise<Invoice>;
-
-  deleteInvoice: (id: string) => Promise<void>;
-
-  createExpense: (
-    data: Partial<Expense>
-  ) => Promise<Expense>;
-
-  updateExpense: (
-    id: string,
-    data: Partial<Expense>
-  ) => Promise<Expense>;
-
-  deleteExpense: (id: string) => Promise<void>;
-}
-
-const BusinessContext =
-  createContext<BusinessContextValue | null>(null);
 
 export function BusinessProvider({
   children,
@@ -169,7 +92,11 @@ export function BusinessProvider({
   }, []);
 
   useEffect(() => {
-    void refreshAll();
+    const timeoutId = window.setTimeout(() => {
+      void refreshAll();
+    }, 0);
+
+    return () => window.clearTimeout(timeoutId);
   }, [refreshAll]);
 
   async function createCustomer(data: Partial<Customer>) {
@@ -284,6 +211,14 @@ export function BusinessProvider({
     await refreshDashboard();
   }
 
+  async function createInvoiceFromTask(taskId: string, amount: number) {
+    const invoice = await businessApi.createInvoiceFromTask(taskId, amount);
+    setInvoices((current) => [invoice, ...current]);
+    setTasks((current) => current.map((task) => task.id === taskId ? { ...task, invoiceId: invoice.id } : task));
+    await refreshDashboard();
+    return invoice;
+  }
+
   async function createInvoice(data: Partial<Invoice>) {
     const invoice = await businessApi.invoices.create(data);
 
@@ -362,8 +297,48 @@ export function BusinessProvider({
     await refreshDashboard();
   }
 
-  const value = useMemo<BusinessContextValue>(
-    () => ({
+  async function createDocument(data: Partial<BusinessDocument>) {
+    const document = await businessApi.documents.create(data);
+    setDocuments((current) => [document, ...current]);
+    await refreshDashboard();
+    return document;
+  }
+
+  async function deleteDocument(id: string) {
+    await businessApi.documents.remove(id);
+    setDocuments((current) => current.filter((item) => item.id !== id));
+    await refreshDashboard();
+  }
+
+  async function runAutomations() {
+    const result = await businessApi.runAutomations();
+    setAutomations(result.automations);
+    setTasks((current) => [
+      ...result.createdTasks,
+      ...current.filter((item) => !result.createdTasks.some((created) => created.id === item.id)),
+    ]);
+    await refreshDashboard();
+    return { ran: result.ran, created: result.createdTasks.length };
+  }
+
+  async function createAutomation(data: Partial<Automation>) {
+    const automation = await businessApi.automations.create(data);
+    setAutomations((current) => [automation, ...current]);
+    return automation;
+  }
+
+  async function updateAutomation(id: string, data: Partial<Automation>) {
+    const automation = await businessApi.automations.update(id, data);
+    setAutomations((current) => current.map((item) => item.id === id ? automation : item));
+    return automation;
+  }
+
+  async function deleteAutomation(id: string) {
+    await businessApi.automations.remove(id);
+    setAutomations((current) => current.filter((item) => item.id !== id));
+  }
+
+  const value = {
       dashboard,
       customers,
       employees,
@@ -387,6 +362,7 @@ export function BusinessProvider({
       deleteEmployee,
 
       createTask,
+      createInvoiceFromTask,
       updateTask,
       deleteTask,
 
@@ -397,38 +373,18 @@ export function BusinessProvider({
       createExpense,
       updateExpense,
       deleteExpense,
-    }),
-    [
-      dashboard,
-      customers,
-      employees,
-      tasks,
-      invoices,
-      expenses,
-      documents,
-      automations,
-      loading,
-      error,
-      refreshAll,
-      refreshDashboard,
-    ]
-  );
+
+      createDocument,
+      deleteDocument,
+      runAutomations,
+      createAutomation,
+      updateAutomation,
+      deleteAutomation,
+    };
 
   return (
     <BusinessContext.Provider value={value}>
       {children}
     </BusinessContext.Provider>
   );
-}
-
-export function useBusiness() {
-  const context = useContext(BusinessContext);
-
-  if (!context) {
-    throw new Error(
-      "useBusiness must be used inside BusinessProvider."
-    );
-  }
-
-  return context;
 }

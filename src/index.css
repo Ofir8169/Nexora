@@ -11,6 +11,7 @@
 }
 
 :root {
+  --nexora-brand: #2563eb;
   --bg: #020617;
   --panel: rgba(15, 23, 42, 0.82);
   --panel-soft: rgba(30, 41, 59, 0.65);
@@ -57,13 +58,183 @@
 
 body {
   margin: 0;
-  font-family: Inter, Arial, sans-serif;
+  font-family: "Geist Variable", Inter, Arial, sans-serif;
   background:
-    radial-gradient(circle at top left, rgba(37, 99, 235, 0.28), transparent 32%),
-    radial-gradient(circle at top right, rgba(139, 92, 246, 0.22), transparent 30%),
-    radial-gradient(circle at bottom, rgba(34, 211, 238, 0.12), transparent 35%),
-    #020617;
-  color: var(--text);
+    radial-gradient(circle at 80% -10%, rgba(59, 130, 246, 0.08), transparent 28rem),
+    #f6f8fc;
+  color: #172033;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  min-width: 320px;
+}
+
+html { scroll-behavior: smooth; }
+
+html.nexora-font-large { font-size: 112.5%; }
+html.nexora-font-xlarge { font-size: 125%; }
+
+html.nexora-high-contrast body,
+html.nexora-high-contrast .nexora-light {
+  background: #ffffff !important;
+  color: #020617 !important;
+}
+
+html.nexora-high-contrast .nexora-surface,
+html.nexora-high-contrast .nexora-light main section,
+html.nexora-high-contrast .nexora-light main [class*="border-slate"] {
+  border-color: #64748b !important;
+}
+
+html.nexora-high-contrast :where(p, span, label)[class*="text-slate-4"],
+html.nexora-high-contrast :where(p, span, label)[class*="text-slate-5"] {
+  color: #334155 !important;
+}
+
+html.nexora-reduce-motion *,
+html.nexora-reduce-motion *::before,
+html.nexora-reduce-motion *::after {
+  scroll-behavior: auto !important;
+  animation-duration: 0.01ms !important;
+  animation-iteration-count: 1 !important;
+  transition-duration: 0.01ms !important;
+}
+
+::selection {
+  background: rgba(37, 99, 235, 0.18);
+  color: #0f172a;
+}
+
+* {
+  scrollbar-width: thin;
+  scrollbar-color: #cbd5e1 transparent;
+}
+
+.nexora-surface {
+  border: 1px solid rgba(226, 232, 240, 0.9);
+  background:
+    radial-gradient(circle at 100% 0%, rgba(96, 165, 250, 0.055), transparent 9rem),
+    rgba(255, 255, 255, 0.94);
+  box-shadow:
+    0 1px 2px rgba(15, 23, 42, 0.025),
+    0 12px 30px rgba(15, 23, 42, 0.035);
+  backdrop-filter: blur(16px);
+}
+
+.nexora-ambient {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.nexora-orb {
+  position: absolute;
+  display: block;
+  border-radius: 9999px;
+  filter: blur(2px);
+  opacity: 0.32;
+}
+
+.nexora-orb-blue {
+  width: 22rem;
+  height: 22rem;
+  inset-block-start: -9rem;
+  inset-inline-end: -7rem;
+  background: radial-gradient(circle at 35% 35%, rgba(96, 165, 250, 0.42), rgba(59, 130, 246, 0.04) 68%, transparent 72%);
+}
+
+.nexora-orb-violet {
+  width: 18rem;
+  height: 18rem;
+  inset-block-end: 4rem;
+  inset-inline-start: 8%;
+  background: radial-gradient(circle at 50% 50%, rgba(167, 139, 250, 0.22), transparent 70%);
+}
+
+.nexora-orb-cyan {
+  width: 14rem;
+  height: 14rem;
+  inset-block-start: 42%;
+  inset-inline-end: 5%;
+  background: radial-gradient(circle at 50% 50%, rgba(34, 211, 238, 0.14), transparent 70%);
+}
+
+.nexora-dot-field {
+  position: absolute;
+  width: 13rem;
+  height: 13rem;
+  inset-block-start: 7rem;
+  inset-inline-end: 12%;
+  opacity: 0.2;
+  background-image: radial-gradient(#94a3b8 1px, transparent 1px);
+  background-size: 16px 16px;
+  mask-image: linear-gradient(to bottom, black, transparent);
+}
+
+.nexora-topbar::after {
+  content: "";
+  position: absolute;
+  inset-inline: 0;
+  inset-block-end: -1px;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, var(--nexora-brand), rgba(124, 58, 237, 0.38), transparent);
+  opacity: 0.55;
+}
+
+.nexora-light > :not(.nexora-ambient) {
+  position: relative;
+  z-index: 1;
+}
+
+.nexora-lift {
+  transition: transform 180ms ease, border-color 180ms ease, box-shadow 180ms ease;
+}
+
+.nexora-lift:hover {
+  transform: translateY(-2px);
+  border-color: rgba(147, 197, 253, 0.8);
+  box-shadow: 0 16px 35px rgba(30, 64, 175, 0.08);
+}
+
+@keyframes nexora-enter {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.nexora-enter {
+  animation: nexora-enter 420ms cubic-bezier(.2,.8,.2,1) both;
+}
+
+.nexora-sidebar {
+  border-inline-end-width: 1px;
+}
+
+html[dir="rtl"] .nexora-sidebar {
+  right: 0;
+  left: auto;
+}
+
+html[dir="rtl"] .nexora-sidebar.-translate-x-full {
+  --tw-translate-x: 100%;
+}
+
+html[dir="rtl"] .text-left { text-align: right; }
+
+.nexora-light main {
+  isolation: isolate;
+  padding-bottom: 6.5rem;
+}
+
+.nexora-light main::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background:
+    radial-gradient(circle at 88% 8%, rgba(99, 102, 241, 0.055), transparent 24rem),
+    radial-gradient(circle at 24% 88%, rgba(14, 165, 233, 0.04), transparent 28rem);
 }
 
 button,
@@ -72,6 +243,274 @@ textarea,
 select {
   font-family: inherit;
 }
+
+/* Calm, light application theme for the legacy dark utility classes. */
+.nexora-light {
+  color-scheme: light;
+  background: #f5f7fb !important;
+  color: #172033 !important;
+}
+
+.nexora-light [class~="bg-slate-950"],
+.nexora-light [class~="bg-slate-950/60"],
+.nexora-light [class~="bg-slate-950/70"],
+.nexora-light [class~="bg-slate-950/80"],
+.nexora-light [class~="bg-slate-900"],
+.nexora-light [class~="bg-slate-900/60"],
+.nexora-light [class~="bg-slate-900/80"],
+.nexora-light [class~="bg-slate-900/85"],
+.nexora-light [class~="bg-slate-900/90"],
+.nexora-light [class~="bg-slate-900/95"],
+.nexora-light [class~="bg-[#070B13]"],
+.nexora-light [class~="bg-[#0F172A]/95"] {
+  background-color: #ffffff !important;
+  background-image: none !important;
+}
+
+.nexora-light [class~="bg-slate-800"],
+.nexora-light [class~="bg-slate-700"],
+.nexora-light [class~="bg-slate-600"] {
+  background-color: #f1f5f9 !important;
+}
+
+/* Normalize legacy operation screens into the same quiet, professional surface system. */
+.nexora-light main [class*="bg-slate-900/95"],
+.nexora-light main [class*="bg-slate-950/70"],
+.nexora-light main [class*="bg-slate-950/60"],
+.nexora-light main [class*="bg-[#0F172A]/95"] {
+  background: rgba(255, 255, 255, 0.96) !important;
+  border-color: #e2e8f0 !important;
+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.03), 0 12px 32px rgba(15, 23, 42, 0.045) !important;
+}
+
+.nexora-light main [class*="text-5xl"] {
+  font-size: clamp(2rem, 4vw, 2.75rem) !important;
+  line-height: 1.08 !important;
+  letter-spacing: -0.035em !important;
+}
+
+.nexora-light main [class*="shadow-2xl"] {
+  --tw-shadow-color: transparent !important;
+}
+
+.nexora-light main table {
+  border-collapse: separate;
+  border-spacing: 0;
+}
+
+.nexora-light main thead {
+  background: #f8fafc !important;
+}
+
+.nexora-light main tbody tr {
+  transition: background-color 160ms ease;
+}
+
+.nexora-light main tbody tr:hover {
+  background: #f8fafc !important;
+}
+
+.nexora-light main button:not(:disabled) { cursor: pointer; }
+.nexora-light main button:disabled { cursor: not-allowed; opacity: 0.55; }
+
+@media (min-width: 768px) {
+  .nexora-light main { padding-bottom: 2rem; }
+}
+
+@media (max-width: 640px) {
+  .nexora-light main [class*="rounded-3xl"] { border-radius: 1rem !important; }
+  .nexora-light main [class*="p-6"] { padding: 1.1rem; }
+  .nexora-light main table { min-width: 620px; }
+}
+
+.nexora-light [class*="text-white"]:not([class*="bg-blue"]):not([class*="bg-red"]):not([class*="bg-cyan"]):not([class*="bg-green"]):not([class*="bg-purple"]):not([class*="bg-gradient"]) {
+  color: #172033 !important;
+}
+
+.nexora-light [class*="text-slate-200"],
+.nexora-light [class*="text-slate-300"] {
+  color: #475569 !important;
+}
+
+.nexora-light [class*="text-slate-400"],
+.nexora-light [class*="text-slate-500"] {
+  color: #64748b !important;
+}
+
+.nexora-light [class*="text-cyan-300"],
+.nexora-light [class*="text-cyan-400"] {
+  color: #0369a1 !important;
+}
+
+.nexora-light [class*="text-blue-300"],
+.nexora-light [class*="text-blue-400"] {
+  color: #1d4ed8 !important;
+}
+
+.nexora-light [class*="text-emerald-300"] {
+  color: #047857 !important;
+}
+
+.nexora-light [class*="text-orange-300"] {
+  color: #b45309 !important;
+}
+
+.nexora-light [class*="text-red-300"] {
+  color: #b91c1c !important;
+}
+
+.nexora-light [class*="border-white/10"],
+.nexora-light [class*="border-white/5"] {
+  border-color: #e2e8f0 !important;
+}
+
+.nexora-light [class*="shadow-cyan"],
+.nexora-light [class*="shadow-blue"] {
+  --tw-shadow-color: rgba(15, 23, 42, 0.08) !important;
+  box-shadow: 0 8px 24px rgba(15, 23, 42, 0.08) !important;
+}
+
+.nexora-light main [class*="rounded-3xl"],
+.nexora-light main [class*="rounded-[32px]"] {
+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04);
+}
+
+.nexora-light input,
+.nexora-light textarea,
+.nexora-light select {
+  color: #172033 !important;
+}
+
+.nexora-light input::placeholder,
+.nexora-light textarea::placeholder {
+  color: #94a3b8 !important;
+}
+
+.nexora-light .leaflet-container {
+  background: #e2e8f0;
+}
+
+.nexora-light .animate-pulse {
+  animation: none !important;
+}
+
+.nexora-light :where(a, button, input, textarea, select):focus-visible {
+  outline: 3px solid rgba(37, 99, 235, 0.35);
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+@media (pointer: coarse) {
+  .nexora-light button,
+  .nexora-light nav a { min-height: 44px; }
+}
+
+@media (max-width: 640px) {
+  .nexora-orb-blue { width: 15rem; height: 15rem; }
+  .nexora-orb-violet { display: none; }
+  .nexora-dot-field { opacity: 0.12; inset-inline-end: -4rem; }
+}
+
+/* Complete dark appearance: shared utilities remain readable across legacy and new screens. */
+html.dark body {
+  background: #080d19;
+  color: #e5edf8;
+}
+
+html.dark .nexora-light {
+  color-scheme: dark;
+  background: #080d19 !important;
+  color: #e5edf8 !important;
+}
+
+html.dark .nexora-ambient { opacity: 0.42; }
+html.dark .nexora-dot-field { opacity: 0.1; }
+
+html.dark .nexora-surface,
+html.dark .nexora-light [class~="bg-white"],
+html.dark .nexora-light [class*="bg-white/"],
+html.dark .nexora-sidebar,
+html.dark .nexora-topbar {
+  background-color: rgba(15, 23, 42, 0.94) !important;
+  background-image: none !important;
+  border-color: #263449 !important;
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.16) !important;
+}
+
+html.dark .nexora-light [class*="bg-slate-50"],
+html.dark .nexora-light [class*="bg-slate-100"],
+html.dark .nexora-light [class*="bg-slate-800"],
+html.dark .nexora-light [class*="bg-slate-900"],
+html.dark .nexora-light [class*="bg-slate-950"] {
+  background-color: #111c2f !important;
+  background-image: none !important;
+}
+
+html.dark .nexora-light main section[class*="from-white"],
+html.dark .nexora-light main header[class*="from-white"] {
+  background: linear-gradient(145deg, #111c2f, #101b31 55%, #17203b) !important;
+  border-color: #293954 !important;
+}
+
+html.dark .nexora-light [class*="text-slate-950"],
+html.dark .nexora-light [class*="text-slate-900"],
+html.dark .nexora-light [class*="text-slate-800"] { color: #f4f7fb !important; }
+
+html.dark .nexora-light [class*="text-slate-700"],
+html.dark .nexora-light [class*="text-slate-600"] { color: #c5d0df !important; }
+
+html.dark .nexora-light [class*="text-slate-500"],
+html.dark .nexora-light [class*="text-slate-400"] { color: #94a3b8 !important; }
+
+html.dark .nexora-light [class*="border-slate-100"],
+html.dark .nexora-light [class*="border-slate-200"],
+html.dark .nexora-light [class*="border-slate-300"] { border-color: #29374b !important; }
+
+html.dark .nexora-light input,
+html.dark .nexora-light textarea,
+html.dark .nexora-light select {
+  background-color: #0d1728 !important;
+  border-color: #334155 !important;
+  color: #f1f5f9 !important;
+}
+
+html.dark .nexora-light table thead,
+html.dark .nexora-light main tbody tr:hover { background: #111c2f !important; }
+
+html.dark .nexora-light .leaflet-container { background: #0f172a; }
+
+html.dark.nexora-high-contrast body,
+html.dark.nexora-high-contrast .nexora-light { background: #000 !important; color: #fff !important; }
+
+.nexora-skeleton {
+  position: relative;
+  overflow: hidden;
+  background: #e9eef6;
+}
+
+.nexora-skeleton::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  transform: translateX(-100%);
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,.72), transparent);
+  animation: nexora-shimmer 1.35s ease-in-out infinite;
+}
+
+html.dark .nexora-skeleton { background: #1e293b; }
+html.dark .nexora-skeleton::after { background: linear-gradient(90deg, transparent, rgba(148,163,184,.12), transparent); }
+
+@keyframes nexora-shimmer { to { transform: translateX(100%); } }
 
 @theme inline {
   --font-heading: var(--font-sans);

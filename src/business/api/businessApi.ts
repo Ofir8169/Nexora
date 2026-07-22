@@ -1,4 +1,5 @@
 import { API_URL } from "./config";
+import { clearAuth, getAuthHeaders } from "../../lib/auth";
 
 import type {
   Activity,
@@ -24,11 +25,17 @@ async function request<T>(
     ...options,
     headers: {
       "Content-Type": "application/json",
+      ...getAuthHeaders(),
       ...options.headers,
     },
   });
 
   if (!response.ok) {
+    if (response.status === 401) {
+      clearAuth();
+      window.location.reload();
+      throw new Error("Your session expired. Please sign in again.");
+    }
     let errorMessage = `Request failed with status ${response.status}`;
 
     try {
@@ -99,6 +106,10 @@ export const businessApi = {
 
   tasks: createCrudApi<BusinessTask>("/tasks"),
 
+  createInvoiceFromTask(taskId: string, amount: number): Promise<Invoice> {
+    return request(`/tasks/${taskId}/invoice`, { method: "POST", body: JSON.stringify({ amount }) });
+  },
+
   invoices: createCrudApi<Invoice>("/invoices"),
 
   expenses: createCrudApi<Expense>("/expenses"),
@@ -106,6 +117,10 @@ export const businessApi = {
   documents: createCrudApi<BusinessDocument>("/documents"),
 
   automations: createCrudApi<Automation>("/automations"),
+
+  runAutomations(): Promise<{ ran: number; createdTasks: BusinessTask[]; automations: Automation[] }> {
+    return request("/automations/run", { method: "POST" });
+  },
 
   activities: createCrudApi<Activity>("/activities"),
 };

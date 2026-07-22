@@ -1,5 +1,3 @@
-import type { ReactNode } from "react";
-
 import {
   AlertTriangle,
   Bot,
@@ -11,9 +9,10 @@ import {
   Truck,
   Users,
 } from "lucide-react";
+import { useState } from "react";
 
 import StableMap from "../../components/maps/StableMap";
-import { useApp } from "../../context/AppContext";
+import { useApp } from "../../context/app-context";
 
 import PageHeader from "../../components/ui-v2/PageHeader";
 import Panel from "../../components/ui-v2/Panel";
@@ -27,6 +26,19 @@ const locations = [
 ];
 
 export default function LiveMap() {
+
+  const [layers, setLayers] = useState<Record<string, boolean>>({
+    Satellite: true,
+    Terrain: false,
+    Routes: true,
+    Fleet: true,
+    Sites: true,
+    "AI Overlay": false,
+    Telemetry: true,
+  });
+
+  const toggleLayer = (title: string) =>
+    setLayers((current) => ({ ...current, [title]: !current[title] }));
 
   const {
     sites,
@@ -155,41 +167,50 @@ export default function LiveMap() {
       <LayerButton
         icon={<Satellite size={18}/>}
         title="Satellite"
-        active
+        active={layers.Satellite}
+        onToggle={() => toggleLayer("Satellite")}
       />
 
       <LayerButton
         icon={<Layers size={18}/>}
         title="Terrain"
+        active={layers.Terrain}
+        onToggle={() => toggleLayer("Terrain")}
       />
 
       <LayerButton
         icon={<Route size={18}/>}
         title="Routes"
-        active
+        active={layers.Routes}
+        onToggle={() => toggleLayer("Routes")}
       />
 
       <LayerButton
         icon={<Truck size={18}/>}
         title="Fleet"
-        active
+        active={layers.Fleet}
+        onToggle={() => toggleLayer("Fleet")}
       />
 
       <LayerButton
         icon={<MapPin size={18}/>}
         title="Sites"
-        active
+        active={layers.Sites}
+        onToggle={() => toggleLayer("Sites")}
       />
 
       <LayerButton
         icon={<Bot size={18}/>}
         title="AI Overlay"
+        active={layers["AI Overlay"]}
+        onToggle={() => toggleLayer("AI Overlay")}
       />
 
       <LayerButton
         icon={<RadioTower size={18}/>}
         title="Telemetry"
-        active
+        active={layers.Telemetry}
+        onToggle={() => toggleLayer("Telemetry")}
       />
 
     </div>
@@ -204,7 +225,9 @@ export default function LiveMap() {
     <div className="relative h-[720px] overflow-hidden rounded-2xl">
 
       <StableMap
-        markers={operationsMarkers}
+        markers={operationsMarkers.filter((marker) =>
+          marker.id.startsWith("site-") ? layers.Sites : layers.Fleet
+        )}
         height="720px"
         center={[32.30,35]}
         zoom={8}
@@ -368,13 +391,18 @@ export default function LiveMap() {
   icon,
   title,
   active = false,
+  onToggle,
 }: {
   icon: React.ReactNode;
   title: string;
   active?: boolean;
+  onToggle: () => void;
 }) {
   return (
     <button
+      type="button"
+      onClick={onToggle}
+      aria-pressed={active}
       className={`flex w-full items-center justify-between rounded-2xl border p-4 transition ${
         active
           ? "border-cyan-400/30 bg-cyan-500/10 text-cyan-300"

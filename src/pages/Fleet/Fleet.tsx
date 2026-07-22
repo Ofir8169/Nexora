@@ -14,13 +14,25 @@ import {
   Wrench,
   X,
 } from "lucide-react";
-import { useApp } from "../../context/AppContext";
+import { useApp } from "../../context/app-context";
+import { useLocation } from "react-router-dom";
+import { getLocale, localized } from "../../lib/preferences";
+import EntityActivity from "../../components/ui-v2/EntityActivity";
+import EntityNotes from "../../components/ui-v2/EntityNotes";
 
 export default function Fleet() {
+  const locale = getLocale();
+  const t = (en: string, he: string) => localized(en, he, locale);
+  const location = useLocation();
   const { fleet, addVehicle, updateVehicle, deleteVehicle } = useApp();
 
-  const [selectedVehicle, setSelectedVehicle] = useState(fleet[0]);
-  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedVehicle, setSelectedVehicle] = useState(() => {
+    const selectedId = Number((location.state as { selectedId?: unknown } | null)?.selectedId);
+    return fleet.find((vehicle) => vehicle.id === selectedId) ?? fleet[0];
+  });
+  const [isModalOpen, setIsModalOpen] = useState(
+    () => location.state?.quickCreate === "vehicle"
+  );
   const [editingVehicleId, setEditingVehicleId] = useState<number | null>(null);
   const [search, setSearch] = useState("");
 
@@ -105,13 +117,13 @@ export default function Fleet() {
       <div className="mb-8 flex items-start justify-between">
         <div>
           <p className="text-sm font-black uppercase tracking-widest text-cyan-400">
-            Fleet Operations
+            {t("Fleet Operations", "ניהול צי")}
           </p>
           <h1 className="mt-2 text-5xl font-black tracking-tight text-white">
-            Fleet Command
+            {t("Fleet Command", "מרכז צי הרכב")}
           </h1>
           <p className="mt-3 text-lg text-slate-300">
-            Monitor vehicle health, readiness, locations and critical issues.
+            {t("Monitor vehicle health, readiness, locations and critical issues.", "מעקב אחר כשירות, מיקום ותקלות קריטיות בצי הרכב.")}
           </p>
         </div>
 
@@ -120,15 +132,15 @@ export default function Fleet() {
           className="flex items-center gap-2 rounded-2xl bg-gradient-to-r from-blue-600 to-purple-600 px-5 py-3 text-sm font-black text-white shadow-xl shadow-blue-500/20"
         >
           <Plus size={18} />
-          New Vehicle
+          {t("New Vehicle", "רכב חדש")}
         </button>
       </div>
 
       <div className="grid gap-5 xl:grid-cols-4">
-        <FleetKPI icon={<Truck />} title="Total Assets" value={fleet.length} note="Fleet tracked" color="blue" />
-        <FleetKPI icon={<CheckCircle2 />} title="Operational" value={active} note="Ready to deploy" color="green" />
-        <FleetKPI icon={<Wrench />} title="Maintenance" value={maintenance} note="Service required" color="orange" />
-        <FleetKPI icon={<AlertTriangle />} title="Critical" value={critical} note="Needs review" color="red" />
+        <FleetKPI icon={<Truck />} title={t("Total Assets", "סך רכבים")} value={fleet.length} note={t("Fleet tracked", "רכבים במעקב")} color="blue" />
+        <FleetKPI icon={<CheckCircle2 />} title={t("Operational", "פעילים")} value={active} note={t("Ready to deploy", "מוכנים לפעילות")} color="green" />
+        <FleetKPI icon={<Wrench />} title={t("Maintenance", "בטיפול")} value={maintenance} note={t("Service required", "נדרש שירות")} color="orange" />
+        <FleetKPI icon={<AlertTriangle />} title={t("Critical", "קריטיים")} value={critical} note={t("Needs review", "דורשים בדיקה")} color="red" />
       </div>
 
       <div className="my-6 flex items-center gap-3 rounded-3xl border border-blue-400/30 bg-slate-900/95 px-5 py-4 shadow-2xl shadow-blue-500/10">
@@ -136,14 +148,14 @@ export default function Fleet() {
         <input
           value={search}
           onChange={(e) => setSearch(e.target.value)}
-          placeholder="Search vehicles, sites or status..."
+          placeholder={t("Search vehicles, sites or status...", "חיפוש לפי רכב, אתר או סטטוס...")}
           className="w-full bg-transparent text-sm text-white outline-none placeholder:text-slate-500"
         />
       </div>
       <div className="grid gap-6 xl:grid-cols-[1fr_430px]">
-        <Panel title="Fleet Assets">
+        <Panel title={t("Fleet Assets", "רכבי הצי")}>
           {filteredFleet.length === 0 ? (
-            <p className="text-sm text-slate-400">No vehicles found.</p>
+            <p className="text-sm text-slate-400">{t("No vehicles found.", "לא נמצאו רכבים.")}</p>
           ) : (
             <div className="grid gap-4 md:grid-cols-2">
               {filteredFleet.map((vehicle) => {
@@ -185,7 +197,7 @@ export default function Fleet() {
 
                     <div className="mt-5">
                       <div className="mb-2 flex justify-between text-sm">
-                        <span className="text-slate-400">Health</span>
+                      <span className="text-slate-400">{t("Health", "כשירות")}</span>
                         <span className="font-black text-white">{vehicle.health}</span>
                       </div>
 
@@ -210,9 +222,9 @@ export default function Fleet() {
         </Panel>
 
         {selectedVehicle ? (
-          <Panel title="Vehicle Details">
+          <Panel title={t("Vehicle Details", "פרטי רכב")}>
             <p className="text-sm font-black uppercase tracking-widest text-cyan-400">
-              Selected Asset
+              {t("Selected Asset", "רכב שנבחר")}
             </p>
 
             <h2 className="mt-2 text-3xl font-black text-white">
@@ -226,26 +238,29 @@ export default function Fleet() {
             </div>
 
             <div className="mt-6 grid grid-cols-2 gap-3">
-              <InfoDark label="Site" value={selectedVehicle.site} />
-              <InfoDark label="Status" value={selectedVehicle.status} />
-              <InfoDark label="Health" value={selectedVehicle.health} />
-              <InfoDark label="Issues" value={String(selectedVehicle.issues)} />
+              <InfoDark label={t("Site", "אתר")} value={selectedVehicle.site} />
+              <InfoDark label={t("Status", "סטטוס")} value={selectedVehicle.status} />
+              <InfoDark label={t("Health", "כשירות")} value={selectedVehicle.health} />
+              <InfoDark label={t("Issues", "תקלות")} value={String(selectedVehicle.issues)} />
             </div>
 
             <div className="mt-7 rounded-2xl border border-cyan-400/20 bg-cyan-500/10 p-4">
               <div className="flex items-center gap-2 text-cyan-300">
                 <Battery size={18} />
-                <p className="text-sm font-black">AI Fleet Brief</p>
+                <p className="text-sm font-black">{t("AI Fleet Brief", "סיכום צי חכם")}</p>
               </div>
 
               <p className="mt-3 text-sm leading-6 text-slate-200">
                 {selectedVehicle.status === "Critical"
-                  ? `${selectedVehicle.name} should not be deployed before inspection.`
+                  ? t(`${selectedVehicle.name} should not be deployed before inspection.`, `אין להוציא את ${selectedVehicle.name} לפעילות לפני בדיקה.`)
                   : selectedVehicle.status === "Maintenance"
-                  ? `${selectedVehicle.name} is due for maintenance.`
-                  : `${selectedVehicle.name} is operational and ready for deployment.`}
+                  ? t(`${selectedVehicle.name} is due for maintenance.`, `${selectedVehicle.name} ממתין לטיפול תחזוקה.`)
+                  : t(`${selectedVehicle.name} is operational and ready for deployment.`, `${selectedVehicle.name} תקין ומוכן לפעילות.`)}
               </p>
             </div>
+
+            <EntityActivity createdLabel={t("Vehicle added to fleet", "הרכב נוסף לצי")} updatedLabel={t(`Health updated to ${selectedVehicle.health}`, `הכשירות עודכנה ל-${selectedVehicle.health}`)} />
+            <EntityNotes key={`vehicle_${selectedVehicle.id}`} entityKey={`vehicle_${selectedVehicle.id}`} />
 
             <div className="mt-7 flex flex-wrap gap-3">
               <button
@@ -253,7 +268,7 @@ export default function Fleet() {
                 className="flex items-center gap-2 rounded-2xl bg-slate-800 px-4 py-3 text-sm font-black text-white hover:bg-slate-700"
               >
                 <Edit size={16} />
-                Edit
+                {t("Edit", "עריכה")}
               </button>
 
               <button
@@ -261,13 +276,13 @@ export default function Fleet() {
                 className="flex items-center gap-2 rounded-2xl bg-red-600 px-4 py-3 text-sm font-black text-white hover:bg-red-500"
               >
                 <Trash2 size={16} />
-                Delete
+                {t("Delete", "מחיקה")}
               </button>
             </div>
           </Panel>
         ) : (
-          <Panel title="Vehicle Details">
-            <p className="text-sm text-slate-400">No vehicle selected.</p>
+          <Panel title={t("Vehicle Details", "פרטי רכב")}>
+            <p className="text-sm text-slate-400">{t("No vehicle selected.", "לא נבחר רכב.")}</p>
           </Panel>
         )}
       </div>

@@ -6,19 +6,30 @@ import {
   Plus,
   Search,
   Trash2,
-  User,
   Users,
   X,
   MapPin,
   Activity,
 } from "lucide-react";
-import { useApp } from "../../context/AppContext";
+import { useApp } from "../../context/app-context";
+import { useLocation } from "react-router-dom";
+import { getLocale, localized } from "../../lib/preferences";
+import EntityActivity from "../../components/ui-v2/EntityActivity";
+import EntityNotes from "../../components/ui-v2/EntityNotes";
 
 export default function Employees() {
+  const locale = getLocale();
+  const t = (en: string, he: string) => localized(en, he, locale);
+  const location = useLocation();
   const { employees, addEmployee, updateEmployee, deleteEmployee } = useApp();
 
-  const [selectedEmployee, setSelectedEmployee] = useState(employees[0]);
-  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedEmployee, setSelectedEmployee] = useState(() => {
+    const selectedId = Number((location.state as { selectedId?: unknown } | null)?.selectedId);
+    return employees.find((employee) => employee.id === selectedId) ?? employees[0];
+  });
+  const [isModalOpen, setIsModalOpen] = useState(
+    () => location.state?.quickCreate === "employee"
+  );
   const [editingEmployeeId, setEditingEmployeeId] = useState<number | null>(null);
   const [search, setSearch] = useState("");
 
@@ -101,13 +112,13 @@ export default function Employees() {
       <div className="mb-8 flex items-start justify-between">
         <div>
           <p className="text-sm font-black uppercase tracking-widest text-cyan-400">
-            Workforce Operations
+            {t("Workforce Operations", "ניהול כוח אדם")}
           </p>
           <h1 className="mt-2 text-5xl font-black tracking-tight text-white">
-            Employees Command
+            {t("Employees Command", "מרכז העובדים")}
           </h1>
           <p className="mt-3 text-lg text-slate-300">
-            Monitor workforce, availability, workload and field assignments.
+            {t("Monitor workforce, availability, workload and field assignments.", "מעקב אחר זמינות, עומס עבודה ושיבוצים בשטח.")}
           </p>
         </div>
 
@@ -116,15 +127,15 @@ export default function Employees() {
           className="flex items-center gap-2 rounded-2xl bg-gradient-to-r from-blue-600 to-purple-600 px-5 py-3 text-sm font-black text-white shadow-xl shadow-blue-500/20"
         >
           <Plus size={18} />
-          New Employee
+          {t("New Employee", "עובד חדש")}
         </button>
       </div>
 
       <div className="grid gap-5 xl:grid-cols-4">
-        <EmployeeKPI icon={<Users />} title="Total Employees" value={employees.length} note="Workforce tracked" color="blue" />
-        <EmployeeKPI icon={<CheckCircle2 />} title="Available" value={available} note="Ready for assignment" color="green" />
-        <EmployeeKPI icon={<Briefcase />} title="Busy" value={busy} note="Currently assigned" color="orange" />
-        <EmployeeKPI icon={<Activity />} title="High Load" value={highWorkload} note="Needs balancing" color="red" />
+        <EmployeeKPI icon={<Users />} title={t("Total Employees", "סך עובדים")} value={employees.length} note={t("Workforce tracked", "עובדים במעקב")} color="blue" />
+        <EmployeeKPI icon={<CheckCircle2 />} title={t("Available", "זמינים")} value={available} note={t("Ready for assignment", "מוכנים לשיבוץ")} color="green" />
+        <EmployeeKPI icon={<Briefcase />} title={t("Busy", "עסוקים")} value={busy} note={t("Currently assigned", "משובצים כעת")} color="orange" />
+        <EmployeeKPI icon={<Activity />} title={t("High Load", "עומס גבוה")} value={highWorkload} note={t("Needs balancing", "נדרש איזון")} color="red" />
       </div>
 
       <div className="my-6 flex items-center gap-3 rounded-3xl border border-blue-400/30 bg-slate-900/95 px-5 py-4 shadow-2xl shadow-blue-500/10">
@@ -132,14 +143,14 @@ export default function Employees() {
         <input
           value={search}
           onChange={(e) => setSearch(e.target.value)}
-          placeholder="Search employees, roles, sites or status..."
+          placeholder={t("Search employees, roles, sites or status...", "חיפוש לפי עובד, תפקיד, אתר או סטטוס...")}
           className="w-full bg-transparent text-sm text-white outline-none placeholder:text-slate-500"
         />
       </div>
       <div className="grid gap-6 xl:grid-cols-[1fr_430px]">
-        <Panel title="Workforce">
+        <Panel title={t("Workforce", "צוות העובדים")}>
           {filteredEmployees.length === 0 ? (
-            <p className="text-sm text-slate-400">No employees found.</p>
+            <p className="text-sm text-slate-400">{t("No employees found.", "לא נמצאו עובדים.")}</p>
           ) : (
             <div className="grid gap-4 md:grid-cols-2">
               {filteredEmployees.map((employee) => (
@@ -203,9 +214,9 @@ export default function Employees() {
         </Panel>
 
         {selectedEmployee ? (
-          <Panel title="Employee Details">
+          <Panel title={t("Employee Details", "פרטי עובד")}>
             <p className="text-sm font-black uppercase tracking-widest text-cyan-400">
-              Selected Employee
+              {t("Selected Employee", "עובד שנבחר")}
             </p>
 
             <div className="mt-5 flex items-center gap-4">
@@ -236,7 +247,7 @@ export default function Employees() {
 
             <div className="mt-7 rounded-2xl border border-cyan-400/20 bg-cyan-500/10 p-4">
               <p className="text-sm font-black text-cyan-300">
-                AI Workforce Recommendation
+                {t("AI Workforce Recommendation", "המלצת כוח אדם חכמה")}
               </p>
 
               <p className="mt-3 text-sm leading-6 text-slate-200">
@@ -248,13 +259,16 @@ export default function Employees() {
               </p>
             </div>
 
+            <EntityActivity createdLabel={t("Employee joined the workspace", "העובד נוסף למערכת")} updatedLabel={t(`Workload updated to ${selectedEmployee.workload}%`, `העומס עודכן ל-${selectedEmployee.workload}%`)} />
+            <EntityNotes key={`employee_${selectedEmployee.id}`} entityKey={`employee_${selectedEmployee.id}`} />
+
             <div className="mt-7 flex gap-3">
               <button
                 onClick={openEditModal}
                 className="flex items-center gap-2 rounded-2xl bg-slate-800 px-4 py-3 text-sm font-black text-white"
               >
                 <Edit size={16} />
-                Edit
+                {t("Edit", "עריכה")}
               </button>
 
               <button
@@ -262,13 +276,13 @@ export default function Employees() {
                 className="flex items-center gap-2 rounded-2xl bg-red-600 px-4 py-3 text-sm font-black text-white"
               >
                 <Trash2 size={16} />
-                Delete
+                {t("Delete", "מחיקה")}
               </button>
             </div>
           </Panel>
         ) : (
-          <Panel title="Employee Details">
-            <p className="text-slate-400">No employee selected.</p>
+          <Panel title={t("Employee Details", "פרטי עובד")}>
+            <p className="text-slate-400">{t("No employee selected.", "לא נבחר עובד.")}</p>
           </Panel>
         )}
       </div>

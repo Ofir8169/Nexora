@@ -9,10 +9,10 @@ export default function Panel({
 }) {
   return (
     <section
-      className={`rounded-3xl border border-white/10 bg-[#0F172A]/95 p-6 shadow-2xl shadow-cyan-950/20 ${className}`}
+      className={`nexora-surface rounded-2xl p-5 sm:p-6 ${className}`}
     >
       {title && (
-        <h2 className="mb-5 text-xl font-black tracking-tight text-white">
+        <h2 className="mb-5 text-lg font-bold tracking-tight text-slate-900">
           {title}
         </h2>
       )}

@@ -53,19 +53,55 @@
   ],
   "tasks": [
     {
-      "id": "task-1",
-      "title": "Collect overdue payment",
-      "description": "Contact Alpha Industries regarding overdue invoice",
+      "id": "dcb0ad2d-7af9-49ff-bb3c-edafac3e0f2d",
+      "title": "Collect payment for INV-1001",
+      "description": "Automated follow-up for INV-1001. Outstanding total: 11800.",
       "customerId": "customer-1",
-      "assigneeId": "employee-2",
       "status": "Open",
       "urgency": 10,
       "businessValue": 9,
       "risk": 8,
       "customerImportance": 9,
       "priorityScore": 90,
+      "priorityLabel": "Critical",
+      "dueDate": "2026-07-21",
+      "createdAt": "2026-07-21T18:12:04.449Z",
+      "updatedAt": "2026-07-21T18:12:04.449Z"
+    },
+    {
+      "title": "ק3ג2ק",
+      "description": "23ג2ג",
+      "customerId": "customer-2",
+      "assigneeId": "employee-1",
+      "status": "In Progress",
+      "urgency": 7,
+      "businessValue": 7,
+      "risk": 5,
+      "customerImportance": 7,
+      "dueDate": "2026-07-21",
+      "id": "a9fe7da3-3b49-47d2-86ac-a1431956cb9b",
+      "createdAt": "2026-07-21T18:10:02.144Z",
+      "updatedAt": "2026-07-22T18:39:39.972Z",
+      "priorityScore": 66,
+      "priorityLabel": "Medium",
+      "workspaceId": "workspace-local"
+    },
+    {
+      "id": "task-1",
+      "title": "Collect overdue payment",
+      "description": "Contact Alpha Industries regarding overdue invoice",
+      "customerId": "customer-1",
+      "assigneeId": "employee-2",
+      "status": "In Progress",
+      "urgency": 10,
+      "businessValue": 9,
+      "risk": 8,
+      "customerImportance": 9,
+      "priorityScore": 92,
       "dueDate": "2026-07-22",
-      "createdAt": "2026-07-20T08:00:00.000Z"
+      "createdAt": "2026-07-20T08:00:00.000Z",
+      "updatedAt": "2026-07-21T18:10:05.733Z",
+      "priorityLabel": "Critical"
     }
   ],
   "invoices": [
@@ -115,11 +151,945 @@
       "trigger": "INVOICE_OVERDUE",
       "action": "CREATE_TASK",
       "enabled": true,
-      "lastRun": null,
-      "createdAt": "2026-07-20T08:00:00.000Z"
+      "lastRun": "2026-07-22T18:36:53.971Z",
+      "createdAt": "2026-07-20T08:00:00.000Z",
+      "updatedAt": "2026-07-22T18:36:53.971Z",
+      "lastResult": {
+        "createdTasks": 0,
+        "checkedAt": "2026-07-22T18:36:53.971Z"
+      }
+    }
+  ],
+  "operationalTasks": [
+    {
+      "id": 2,
+      "title": "Upload Field Photos",
+      "site": "Tel Aviv",
+      "owner": "Maya",
+      "priority": "Medium",
+      "status": "In Progress",
+      "due": "Today",
+      "description": "Upload all media from today's mission.",
+      "checklist": [],
+      "createdAt": "2026-07-21T18:12:26.120Z",
+      "updatedAt": "2026-07-22T18:40:06.819Z",
+      "workspaceId": "workspace-local"
+    },
+    {
+      "id": 3,
+      "title": "Generator Maintenance",
+      "site": "Haifa",
+      "owner": "Ron",
+      "priority": "High",
+      "status": "In Progress",
+      "due": "Tomorrow",
+      "description": "Replace filters and test generator.",
+      "checklist": [],
+      "createdAt": "2026-07-21T18:12:26.117Z",
+      "updatedAt": "2026-07-21T18:12:26.117Z"
+    },
+    {
+      "id": 1,
+      "title": "Inspect Truck BW-104",
+      "site": "Site North",
+      "owner": "Ofir",
+      "priority": "Critical",
+      "status": "In Progress",
+      "due": "Today",
+      "description": "Perform full inspection before deployment.",
+      "checklist": [
+        {
+          "text": "Check Tires",
+          "done": true
+        },
+        {
+          "text": "Check Oil",
+          "done": false
+        },
+        {
+          "text": "Check Cameras",
+          "done": false
+        },
+        {
+          "text": "Check GPS",
+          "done": false
+        }
+      ],
+      "createdAt": "2026-07-21T18:12:26.115Z",
+      "updatedAt": "2026-07-22T18:16:56.477Z",
+      "workspaceId": "workspace-local"
+    }
+  ],
+  "fleet": [
+    {
+      "id": 3,
+      "name": "Van 12",
+      "type": "Field Crew",
+      "site": "Tel Aviv Project",
+      "status": "Maintenance",
+      "health": "74%",
+      "issues": 1,
+      "createdAt": "2026-07-21T18:12:26.115Z",
+      "updatedAt": "2026-07-21T18:12:26.115Z"
+    },
+    {
+      "id": 2,
+      "name": "Truck 08",
+      "type": "Heavy Vehicle",
+      "site": "Haifa Yard",
+      "status": "Active",
+      "health": "91%",
+      "issues": 0,
+      "createdAt": "2026-07-21T18:12:26.114Z",
+      "updatedAt": "2026-07-21T18:12:26.114Z"
+    },
+    {
+      "id": 1,
+      "name": "Truck BW-104",
+      "type": "Service Truck",
+      "site": "Site North",
+      "status": "Critical",
+      "health": "62%",
+      "issues": 2,
+      "createdAt": "2026-07-21T18:12:26.113Z",
+      "updatedAt": "2026-07-21T18:12:26.113Z"
+    }
+  ],
+  "operationalEmployees": [
+    {
+      "id": 4,
+      "name": "Ofir Krichman",
+      "role": "Operations Manager",
+      "site": "HQ",
+      "status": "Available",
+      "workload": 41,
+      "createdAt": "2026-07-21T18:12:26.123Z",
+      "updatedAt": "2026-07-21T18:12:26.123Z"
+    },
+    {
+      "id": 3,
+      "name": "Daniel Bar",
+      "role": "Mechanic",
+      "site": "Haifa Yard",
+      "status": "Maintenance",
+      "workload": 58,
+      "createdAt": "2026-07-21T18:12:26.119Z",
+      "updatedAt": "2026-07-21T18:12:26.119Z"
+    },
+    {
+      "id": 2,
+      "name": "Maya Levi",
+      "role": "Technician",
+      "site": "Tel Aviv Project",
+      "status": "Available",
+      "workload": 34,
+      "createdAt": "2026-07-21T18:12:26.118Z",
+      "updatedAt": "2026-07-21T18:12:26.118Z"
+    },
+    {
+      "id": 1,
+      "name": "Ron Cohen",
+      "role": "Field Operator",
+      "site": "Site North",
+      "status": "Busy",
+      "workload": 92,
+      "createdAt": "2026-07-21T18:12:26.117Z",
+      "updatedAt": "2026-07-21T18:12:26.117Z"
+    }
+  ],
+  "sites": [
+    {
+      "id": 3,
+      "name": "Haifa Yard",
+      "status": "Maintenance",
+      "employees": 5,
+      "vehicles": 6,
+      "tasks": 7,
+      "issues": 1,
+      "risk": 46,
+      "createdAt": "2026-07-21T18:12:26.122Z",
+      "updatedAt": "2026-07-21T18:12:26.122Z"
+    },
+    {
+      "id": 2,
+      "name": "Tel Aviv Project",
+      "status": "Active",
+      "employees": 8,
+      "vehicles": 3,
+      "tasks": 11,
+      "issues": 0,
+      "risk": 21,
+      "createdAt": "2026-07-21T18:12:26.121Z",
+      "updatedAt": "2026-07-21T18:12:26.121Z"
+    },
+    {
+      "id": 1,
+      "name": "Site North",
+      "status": "Critical",
+      "employees": 12,
+      "vehicles": 4,
+      "tasks": 18,
+      "issues": 2,
+      "risk": 82,
+      "createdAt": "2026-07-21T18:12:26.120Z",
+      "updatedAt": "2026-07-21T18:12:26.120Z"
     }
   ],
   "activities": [
+    {
+      "id": "2d514988-d030-40ee-a737-84d8a50f3462",
+      "type": "operationalTasks",
+      "title": "Operational task updated",
+      "description": "Upload Field Photos",
+      "entityId": 2,
+      "workspaceId": "workspace-local",
+      "actorEmail": "ofir@nexora.ai",
+      "createdAt": "2026-07-22T18:40:06.819Z"
+    },
+    {
+      "id": "44d607ce-70a4-45f7-82e3-e4eab8943ed0",
+      "type": "operationalTasks",
+      "title": "Operational task updated",
+      "description": "Upload Field Photos",
+      "entityId": 2,
+      "workspaceId": "workspace-local",
+      "actorEmail": "ofir@nexora.ai",
+      "createdAt": "2026-07-22T18:40:00.185Z"
+    },
+    {
+      "id": "7ec76168-7df8-47e7-a733-250143aaf8a1",
+      "type": "operationalTasks",
+      "title": "Operational task updated",
+      "description": "Upload Field Photos",
+      "entityId": 2,
+      "workspaceId": "workspace-local",
+      "actorEmail": "ofir@nexora.ai",
+      "createdAt": "2026-07-22T18:39:55.476Z"
+    },
+    {
+      "id": "6d34d425-a9df-496f-b902-93c81a0e6b38",
+      "type": "operationalTasks",
+      "title": "Operational task updated",
+      "description": "Upload Field Photos",
+      "entityId": 2,
+      "workspaceId": "workspace-local",
+      "actorEmail": "ofir@nexora.ai",
+      "createdAt": "2026-07-22T18:39:53.202Z"
+    },
+    {
+      "id": "39fd2150-2c96-4fc7-884e-1c7a41f672da",
+      "type": "tasks",
+      "title": "Task updated",
+      "description": "ק3ג2ק",
+      "entityId": "a9fe7da3-3b49-47d2-86ac-a1431956cb9b",
+      "workspaceId": "workspace-local",
+      "actorEmail": "ofir@nexora.ai",
+      "createdAt": "2026-07-22T18:39:39.972Z"
+    },
+    {
+      "id": "c21a03aa-6a6e-40ec-a362-0adcf91bd34c",
+      "type": "user",
+      "title": "Team member invited",
+      "description": "ofir krich · Finance",
+      "entityId": "64efc35a-217d-48af-890b-1b2b196ae2d2",
+      "workspaceId": "workspace-local",
+      "actorEmail": "ofir@nexora.ai",
+      "createdAt": "2026-07-22T18:39:21.740Z"
+    },
+    {
+      "id": "6cd5439d-df19-4e45-ab8f-412b66b85332",
+      "type": "system",
+      "title": "Workspace data exported",
+      "description": "Export created at 2026-07-22T18:37:09.648Z",
+      "entityId": null,
+      "workspaceId": "workspace-local",
+      "actorEmail": "ofir@nexora.ai",
+      "createdAt": "2026-07-22T18:37:09.649Z"
+    },
+    {
+      "id": "17a55201-c0ef-4d60-9ef9-5c9a0dcd69b7",
+      "type": "operationalTasks",
+      "title": "Operational task updated",
+      "description": "Inspect Truck BW-104",
+      "entityId": 1,
+      "workspaceId": "workspace-local",
+      "actorEmail": "ofir@nexora.ai",
+      "createdAt": "2026-07-22T18:16:56.477Z"
+    },
+    {
+      "id": "b7a39e57-d5b0-449f-92a8-4f0d829936b0",
+      "type": "operationalTasks",
+      "title": "Operational task updated",
+      "description": "Upload Field Photos",
+      "entityId": 2,
+      "workspaceId": "workspace-local",
+      "actorEmail": "ofir@nexora.ai",
+      "createdAt": "2026-07-22T18:16:49.864Z"
+    },
+    {
+      "id": "bc4e47d8-32d9-44b9-af9a-213078309cec",
+      "type": "operationalEmployees",
+      "title": "Operational employee created",
+      "description": "Ofir Krichman",
+      "entityId": 4,
+      "createdAt": "2026-07-21T18:12:26.123Z"
+    },
+    {
+      "id": "2ce6417f-1a74-4a7a-954b-544ac2fb9a81",
+      "type": "sites",
+      "title": "Site created",
+      "description": "Haifa Yard",
+      "entityId": 3,
+      "createdAt": "2026-07-21T18:12:26.122Z"
+    },
+    {
+      "id": "1bf3e7e4-8d14-47ee-80d1-b806cdd42841",
+      "type": "sites",
+      "title": "Site created",
+      "description": "Tel Aviv Project",
+      "entityId": 2,
+      "createdAt": "2026-07-21T18:12:26.121Z"
+    },
+    {
+      "id": "92632567-bc14-45a9-9902-70b7e7553306",
+      "type": "sites",
+      "title": "Site created",
+      "description": "Site North",
+      "entityId": 1,
+      "createdAt": "2026-07-21T18:12:26.120Z"
+    },
+    {
+      "id": "e8c3a31f-e332-44ed-9819-00c7e9c34edf",
+      "type": "operationalTasks",
+      "title": "Operational task created",
+      "description": "Upload Field Photos",
+      "entityId": 2,
+      "createdAt": "2026-07-21T18:12:26.120Z"
+    },
+    {
+      "id": "97bf4804-df85-4429-98f4-dcf0a56b4759",
+      "type": "operationalEmployees",
+      "title": "Operational employee created",
+      "description": "Daniel Bar",
+      "entityId": 3,
+      "createdAt": "2026-07-21T18:12:26.119Z"
+    },
+    {
+      "id": "bfc52a07-1ae3-4e5d-bf7c-49e7de15f5a4",
+      "type": "operationalEmployees",
+      "title": "Operational employee created",
+      "description": "Maya Levi",
+      "entityId": 2,
+      "createdAt": "2026-07-21T18:12:26.118Z"
+    },
+    {
+      "id": "07e4a6a9-6e4f-465e-ab06-d9c7710ebe36",
+      "type": "operationalEmployees",
+      "title": "Operational employee created",
+      "description": "Ron Cohen",
+      "entityId": 1,
+      "createdAt": "2026-07-21T18:12:26.117Z"
+    },
+    {
+      "id": "e12e4f3e-f8a2-4084-9fd6-80c1eca82485",
+      "type": "operationalTasks",
+      "title": "Operational task created",
+      "description": "Generator Maintenance",
+      "entityId": 3,
+      "createdAt": "2026-07-21T18:12:26.117Z"
+    },
+    {
+      "id": "d3b8d392-30da-466b-8aa6-eaa83104a929",
+      "type": "sites",
+      "title": "Site deleted",
+      "description": "Site North",
+      "entityId": 1,
+      "createdAt": "2026-07-21T18:12:26.116Z"
+    },
+    {
+      "id": "c0941446-450c-4d77-adb5-9173daab9754",
+      "type": "operationalTasks",
+      "title": "Operational task created",
+      "description": "Inspect Truck BW-104",
+      "entityId": 1,
+      "createdAt": "2026-07-21T18:12:26.115Z"
+    },
+    {
+      "id": "a371e8c8-bf04-45c8-89e5-5a41c116fc03",
+      "type": "fleet",
+      "title": "Vehicle created",
+      "description": "Van 12",
+      "entityId": 3,
+      "createdAt": "2026-07-21T18:12:26.115Z"
+    },
+    {
+      "id": "4fbef06e-89d9-45bc-857e-5b5f471fa0b7",
+      "type": "fleet",
+      "title": "Vehicle created",
+      "description": "Truck 08",
+      "entityId": 2,
+      "createdAt": "2026-07-21T18:12:26.114Z"
+    },
+    {
+      "id": "bb6fd888-33ca-4807-a230-a420ec8d544f",
+      "type": "fleet",
+      "title": "Vehicle created",
+      "description": "Truck BW-104",
+      "entityId": 1,
+      "createdAt": "2026-07-21T18:12:26.113Z"
+    },
+    {
+      "id": "25823215-3264-467b-885c-b06f9db7837b",
+      "type": "operationalEmployees",
+      "title": "Operational employee deleted",
+      "description": "Ron Cohen",
+      "entityId": 1,
+      "createdAt": "2026-07-21T18:12:26.112Z"
+    },
+    {
+      "id": "cb94a003-7dfa-4a80-aca4-c7c6f1f8aba5",
+      "type": "sites",
+      "title": "Site deleted",
+      "description": "Tel Aviv Project",
+      "entityId": 2,
+      "createdAt": "2026-07-21T18:12:26.112Z"
+    },
+    {
+      "id": "375d12fb-91bf-4dc7-b835-ffa540642145",
+      "type": "sites",
+      "title": "Site deleted",
+      "description": "Haifa Yard",
+      "entityId": 3,
+      "createdAt": "2026-07-21T18:12:26.111Z"
+    },
+    {
+      "id": "bcdb90ea-b728-4d11-8271-3f0fbde36f83",
+      "type": "operationalEmployees",
+      "title": "Operational employee deleted",
+      "description": "Daniel Bar",
+      "entityId": 3,
+      "createdAt": "2026-07-21T18:12:26.110Z"
+    },
+    {
+      "id": "a1666c04-307d-4fdb-9250-30c5f4905f0a",
+      "type": "operationalEmployees",
+      "title": "Operational employee deleted",
+      "description": "Ofir Krichman",
+      "entityId": 4,
+      "createdAt": "2026-07-21T18:12:26.109Z"
+    },
+    {
+      "id": "92641872-0ccb-40da-9262-1c3366954602",
+      "type": "operationalTasks",
+      "title": "Operational task deleted",
+      "description": "Inspect Truck BW-104",
+      "entityId": 1,
+      "createdAt": "2026-07-21T18:12:26.108Z"
+    },
+    {
+      "id": "407c053d-b6d4-4cb1-8266-7bc5b17e79db",
+      "type": "operationalTasks",
+      "title": "Operational task deleted",
+      "description": "Generator Maintenance",
+      "entityId": 3,
+      "createdAt": "2026-07-21T18:12:26.108Z"
+    },
+    {
+      "id": "10ad92ac-6940-4012-94be-b183d3f07c14",
+      "type": "operationalTasks",
+      "title": "Operational task deleted",
+      "description": "Upload Field Photos",
+      "entityId": 2,
+      "createdAt": "2026-07-21T18:12:26.107Z"
+    },
+    {
+      "id": "232c8e0f-cb29-4d58-9d32-c45454295e63",
+      "type": "fleet",
+      "title": "Vehicle deleted",
+      "description": "Truck 08",
+      "entityId": 2,
+      "createdAt": "2026-07-21T18:12:26.106Z"
+    },
+    {
+      "id": "55b3d550-6be2-42e9-a28c-e22603271872",
+      "type": "operationalEmployees",
+      "title": "Operational employee deleted",
+      "description": "Maya Levi",
+      "entityId": 2,
+      "createdAt": "2026-07-21T18:12:26.105Z"
+    },
+    {
+      "id": "8b15cee0-d1fb-42d3-9426-23c043458542",
+      "type": "fleet",
+      "title": "Vehicle deleted",
+      "description": "Van 12",
+      "entityId": 3,
+      "createdAt": "2026-07-21T18:12:26.104Z"
+    },
+    {
+      "id": "5784e489-4253-4645-85e6-054ce0ff470d",
+      "type": "fleet",
+      "title": "Vehicle deleted",
+      "description": "Truck BW-104",
+      "entityId": 1,
+      "createdAt": "2026-07-21T18:12:26.101Z"
+    },
+    {
+      "id": "8492e322-b5de-4778-85af-d95da7e74bce",
+      "type": "fleet",
+      "title": "Vehicle created",
+      "description": "Truck BW-104",
+      "entityId": 1,
+      "createdAt": "2026-07-21T18:12:25.432Z"
+    },
+    {
+      "id": "09011136-372f-4bbb-b211-0f01709b652b",
+      "type": "fleet",
+      "title": "Vehicle created",
+      "description": "Van 12",
+      "entityId": 3,
+      "createdAt": "2026-07-21T18:12:25.431Z"
+    },
+    {
+      "id": "0665632e-a898-4cd1-9d13-4dc0a896b386",
+      "type": "fleet",
+      "title": "Vehicle created",
+      "description": "Truck 08",
+      "entityId": 2,
+      "createdAt": "2026-07-21T18:12:25.430Z"
+    },
+    {
+      "id": "6c7e019d-f8f6-4d97-9e76-2183e8c1a01a",
+      "type": "operationalTasks",
+      "title": "Operational task created",
+      "description": "Upload Field Photos",
+      "entityId": 2,
+      "createdAt": "2026-07-21T18:12:25.430Z"
+    },
+    {
+      "id": "22ad89f6-ed11-4fcb-be7b-950c061095fe",
+      "type": "sites",
+      "title": "Site created",
+      "description": "Haifa Yard",
+      "entityId": 3,
+      "createdAt": "2026-07-21T18:12:25.429Z"
+    },
+    {
+      "id": "ddcadfd5-28ba-4c3f-900c-62e1470e4f1d",
+      "type": "sites",
+      "title": "Site created",
+      "description": "Tel Aviv Project",
+      "entityId": 2,
+      "createdAt": "2026-07-21T18:12:25.428Z"
+    },
+    {
+      "id": "c2ceb617-4135-499f-ab4f-abc5df4327c6",
+      "type": "sites",
+      "title": "Site created",
+      "description": "Site North",
+      "entityId": 1,
+      "createdAt": "2026-07-21T18:12:25.427Z"
+    },
+    {
+      "id": "a2f693d2-b23a-4a7f-9f46-0542d2df27d3",
+      "type": "operationalTasks",
+      "title": "Operational task created",
+      "description": "Generator Maintenance",
+      "entityId": 3,
+      "createdAt": "2026-07-21T18:12:25.426Z"
+    },
+    {
+      "id": "62a7b720-212e-43a9-90ef-76f41f6f959d",
+      "type": "operationalEmployees",
+      "title": "Operational employee created",
+      "description": "Maya Levi",
+      "entityId": 2,
+      "createdAt": "2026-07-21T18:12:25.425Z"
+    },
+    {
+      "id": "6d3dfef1-47dc-47d8-ad62-8249397877a2",
+      "type": "operationalEmployees",
+      "title": "Operational employee created",
+      "description": "Ron Cohen",
+      "entityId": 1,
+      "createdAt": "2026-07-21T18:12:25.424Z"
+    },
+    {
+      "id": "4edf45df-5537-4954-80d3-a022bc603b0a",
+      "type": "operationalTasks",
+      "title": "Operational task created",
+      "description": "Inspect Truck BW-104",
+      "entityId": 1,
+      "createdAt": "2026-07-21T18:12:25.423Z"
+    },
+    {
+      "id": "a8428338-9d7c-4099-b38f-225f7d57019c",
+      "type": "operationalEmployees",
+      "title": "Operational employee created",
+      "description": "Ofir Krichman",
+      "entityId": 4,
+      "createdAt": "2026-07-21T18:12:25.421Z"
+    },
+    {
+      "id": "20a8d9a1-3990-4775-8d95-ebb21bd0b399",
+      "type": "operationalEmployees",
+      "title": "Operational employee created",
+      "description": "Daniel Bar",
+      "entityId": 3,
+      "createdAt": "2026-07-21T18:12:25.420Z"
+    },
+    {
+      "id": "2316413b-7033-487f-b65b-b63e6f2d66e6",
+      "type": "fleet",
+      "title": "Vehicle deleted",
+      "description": "Truck BW-104",
+      "entityId": 1,
+      "createdAt": "2026-07-21T18:12:25.419Z"
+    },
+    {
+      "id": "b3b08b48-f41f-421b-adbf-02aa562433a0",
+      "type": "sites",
+      "title": "Site deleted",
+      "description": "Site North",
+      "entityId": 1,
+      "createdAt": "2026-07-21T18:12:25.418Z"
+    },
+    {
+      "id": "318f2227-d268-4791-8e88-4c2bd927f41f",
+      "type": "sites",
+      "title": "Site deleted",
+      "description": "Tel Aviv Project",
+      "entityId": 2,
+      "createdAt": "2026-07-21T18:12:25.417Z"
+    },
+    {
+      "id": "5659a9fc-3726-46f8-87ef-e2a0ae6cd382",
+      "type": "sites",
+      "title": "Site deleted",
+      "description": "Haifa Yard",
+      "entityId": 3,
+      "createdAt": "2026-07-21T18:12:25.416Z"
+    },
+    {
+      "id": "94292c7c-35da-47c2-9783-d85734b89265",
+      "type": "operationalTasks",
+      "title": "Operational task deleted",
+      "description": "Upload Field Photos",
+      "entityId": 2,
+      "createdAt": "2026-07-21T18:12:25.415Z"
+    },
+    {
+      "id": "14daf934-f42c-432b-b8cf-4c68ed8a0e8d",
+      "type": "operationalEmployees",
+      "title": "Operational employee deleted",
+      "description": "Ron Cohen",
+      "entityId": 1,
+      "createdAt": "2026-07-21T18:12:25.415Z"
+    },
+    {
+      "id": "7e430f0f-8359-43e8-88d2-0382ab82fb58",
+      "type": "operationalEmployees",
+      "title": "Operational employee deleted",
+      "description": "Maya Levi",
+      "entityId": 2,
+      "createdAt": "2026-07-21T18:12:25.414Z"
+    },
+    {
+      "id": "418fead4-98d7-4550-be58-dffa96d2293f",
+      "type": "fleet",
+      "title": "Vehicle deleted",
+      "description": "Truck 08",
+      "entityId": 2,
+      "createdAt": "2026-07-21T18:12:25.413Z"
+    },
+    {
+      "id": "a00431d2-80dc-4f86-8aee-0e6af37fc6d9",
+      "type": "fleet",
+      "title": "Vehicle deleted",
+      "description": "Van 12",
+      "entityId": 3,
+      "createdAt": "2026-07-21T18:12:25.412Z"
+    },
+    {
+      "id": "198e3489-5225-4bbd-a64b-e6975b694329",
+      "type": "operationalTasks",
+      "title": "Operational task deleted",
+      "description": "Generator Maintenance",
+      "entityId": 3,
+      "createdAt": "2026-07-21T18:12:25.411Z"
+    },
+    {
+      "id": "4129f597-d1c7-4863-b74d-b0fd9802d7ec",
+      "type": "operationalEmployees",
+      "title": "Operational employee deleted",
+      "description": "Daniel Bar",
+      "entityId": 3,
+      "createdAt": "2026-07-21T18:12:25.410Z"
+    },
+    {
+      "id": "15b91008-fe23-4d5f-870d-d23c45b482ec",
+      "type": "operationalEmployees",
+      "title": "Operational employee deleted",
+      "description": "Ofir Krichman",
+      "entityId": 4,
+      "createdAt": "2026-07-21T18:12:25.409Z"
+    },
+    {
+      "id": "8af1fa23-d221-4bc1-9e0b-0e6baa83b26d",
+      "type": "operationalTasks",
+      "title": "Operational task deleted",
+      "description": "Inspect Truck BW-104",
+      "entityId": 1,
+      "createdAt": "2026-07-21T18:12:25.408Z"
+    },
+    {
+      "id": "3f2ae8d5-eaa0-4321-9337-34df1f180be3",
+      "type": "operationalTasks",
+      "title": "Operational task deleted",
+      "description": "Maintenance inspection - Truck BW-104",
+      "entityId": 4,
+      "createdAt": "2026-07-21T18:12:25.405Z"
+    },
+    {
+      "id": "eb22e468-a2ea-4052-80d5-bcb12f5025da",
+      "type": "automation",
+      "title": "Automation created task",
+      "description": "Collect payment for INV-1001",
+      "entityId": "dcb0ad2d-7af9-49ff-bb3c-edafac3e0f2d",
+      "createdAt": "2026-07-21T18:12:04.449Z"
+    },
+    {
+      "id": "ff504317-806d-4c1c-aed4-2fd3beb2b1fa",
+      "type": "tasks",
+      "title": "Task updated",
+      "description": "Collect overdue payment",
+      "entityId": "task-1",
+      "createdAt": "2026-07-21T18:10:05.733Z"
+    },
+    {
+      "id": "c9cb0f57-4983-489e-8eb1-a0bc5080820e",
+      "type": "tasks",
+      "title": "Task created",
+      "description": "ק3ג2ק",
+      "entityId": "a9fe7da3-3b49-47d2-86ac-a1431956cb9b",
+      "createdAt": "2026-07-21T18:10:02.145Z"
+    },
+    {
+      "id": "930d7309-431c-4bc9-ae26-7881f44e47b4",
+      "type": "operationalTasks",
+      "title": "Operational task created",
+      "description": "Maintenance inspection - Truck BW-104",
+      "entityId": 4,
+      "createdAt": "2026-07-21T17:05:38.313Z"
+    },
+    {
+      "id": "51f5b7b5-0ec7-43c8-b508-47feba4d34fa",
+      "type": "operationalEmployees",
+      "title": "Operational employee created",
+      "description": "Ofir Krichman",
+      "entityId": 4,
+      "createdAt": "2026-07-21T16:54:04.582Z"
+    },
+    {
+      "id": "4f7fa1da-2729-4e65-ae80-c187fdde7e70",
+      "type": "operationalEmployees",
+      "title": "Operational employee created",
+      "description": "Daniel Bar",
+      "entityId": 3,
+      "createdAt": "2026-07-21T16:54:04.581Z"
+    },
+    {
+      "id": "11f6a665-ce33-4c11-98c6-f1925174ff7f",
+      "type": "operationalEmployees",
+      "title": "Operational employee created",
+      "description": "Maya Levi",
+      "entityId": 2,
+      "createdAt": "2026-07-21T16:54:04.580Z"
+    },
+    {
+      "id": "d6638bea-be8e-4ec0-86f8-0c13005db1c1",
+      "type": "operationalEmployees",
+      "title": "Operational employee created",
+      "description": "Ron Cohen",
+      "entityId": 1,
+      "createdAt": "2026-07-21T16:54:04.579Z"
+    },
+    {
+      "id": "b8aa8cce-32d7-4530-bfaa-2b865cf45cae",
+      "type": "sites",
+      "title": "Site created",
+      "description": "Haifa Yard",
+      "entityId": 3,
+      "createdAt": "2026-07-21T16:54:04.578Z"
+    },
+    {
+      "id": "3201a414-cd06-4e02-add8-405cbffe2385",
+      "type": "sites",
+      "title": "Site created",
+      "description": "Tel Aviv Project",
+      "entityId": 2,
+      "createdAt": "2026-07-21T16:54:04.577Z"
+    },
+    {
+      "id": "fcecfc0d-f701-4490-a49d-d5c176125475",
+      "type": "sites",
+      "title": "Site created",
+      "description": "Site North",
+      "entityId": 1,
+      "createdAt": "2026-07-21T16:54:04.576Z"
+    },
+    {
+      "id": "2f9c827f-f455-44d2-a734-5dc4275fead6",
+      "type": "operationalTasks",
+      "title": "Operational task created",
+      "description": "Generator Maintenance",
+      "entityId": 3,
+      "createdAt": "2026-07-21T16:54:04.574Z"
+    },
+    {
+      "id": "0bee2418-af7b-4b67-9701-0fd47b52d429",
+      "type": "operationalTasks",
+      "title": "Operational task created",
+      "description": "Upload Field Photos",
+      "entityId": 2,
+      "createdAt": "2026-07-21T16:54:04.573Z"
+    },
+    {
+      "id": "b6279591-0cf4-42b1-9663-14180095ec11",
+      "type": "operationalTasks",
+      "title": "Operational task created",
+      "description": "Inspect Truck BW-104",
+      "entityId": 1,
+      "createdAt": "2026-07-21T16:54:04.572Z"
+    },
+    {
+      "id": "af1de088-5bdf-4a4d-80a6-39a9a64e7164",
+      "type": "fleet",
+      "title": "Vehicle created",
+      "description": "Van 12",
+      "entityId": 3,
+      "createdAt": "2026-07-21T16:54:04.571Z"
+    },
+    {
+      "id": "28679c89-c33f-4ce5-bdc0-d79fe582df9a",
+      "type": "fleet",
+      "title": "Vehicle created",
+      "description": "Truck 08",
+      "entityId": 2,
+      "createdAt": "2026-07-21T16:54:04.570Z"
+    },
+    {
+      "id": "3a4ef851-5423-49fb-9cb6-ce49f519e091",
+      "type": "fleet",
+      "title": "Vehicle created",
+      "description": "Truck BW-104",
+      "entityId": 1,
+      "createdAt": "2026-07-21T16:54:04.569Z"
+    },
+    {
+      "id": "7b3c63aa-6cd6-4d1b-84e2-be43c0b477bf",
+      "type": "operationalEmployees",
+      "title": "Operational employee deleted",
+      "description": "Ofir Krichman",
+      "entityId": 4,
+      "createdAt": "2026-07-21T16:54:04.567Z"
+    },
+    {
+      "id": "a9813a80-5ad1-4eba-bc8d-7666eba0d768",
+      "type": "operationalEmployees",
+      "title": "Operational employee deleted",
+      "description": "Daniel Bar",
+      "entityId": 3,
+      "createdAt": "2026-07-21T16:54:04.564Z"
+    },
+    {
+      "id": "372df100-871f-4856-af9d-993a5346cefb",
+      "type": "operationalEmployees",
+      "title": "Operational employee deleted",
+      "description": "Maya Levi",
+      "entityId": 2,
+      "createdAt": "2026-07-21T16:54:04.564Z"
+    },
+    {
+      "id": "5c605db6-fd51-436f-be4f-a5a90014485d",
+      "type": "operationalEmployees",
+      "title": "Operational employee deleted",
+      "description": "Ron Cohen",
+      "entityId": 1,
+      "createdAt": "2026-07-21T16:54:04.563Z"
+    },
+    {
+      "id": "8c2e2035-9679-4a82-9f2c-225b6148e152",
+      "type": "sites",
+      "title": "Site deleted",
+      "description": "Haifa Yard",
+      "entityId": 3,
+      "createdAt": "2026-07-21T16:54:04.560Z"
+    },
+    {
+      "id": "cc372daf-68bf-481e-9aa6-dca0a77d105b",
+      "type": "sites",
+      "title": "Site deleted",
+      "description": "Tel Aviv Project",
+      "entityId": 2,
+      "createdAt": "2026-07-21T16:54:04.559Z"
+    },
+    {
+      "id": "09ad962f-a645-4d60-a5ff-82b2ae35b4c0",
+      "type": "sites",
+      "title": "Site deleted",
+      "description": "Site North",
+      "entityId": 1,
+      "createdAt": "2026-07-21T16:54:04.557Z"
+    },
+    {
+      "id": "d7a382bc-f27a-428b-92b3-8dbe6815662e",
+      "type": "operationalTasks",
+      "title": "Operational task deleted",
+      "description": "Generator Maintenance",
+      "entityId": 3,
+      "createdAt": "2026-07-21T16:54:04.556Z"
+    },
+    {
+      "id": "db417ae0-cff5-41a8-9351-74f3ac7c03b4",
+      "type": "operationalTasks",
+      "title": "Operational task deleted",
+      "description": "Upload Field Photos",
+      "entityId": 2,
+      "createdAt": "2026-07-21T16:54:04.556Z"
+    },
+    {
+      "id": "03a7f329-58f9-4674-974e-0dc73530f3e5",
+      "type": "operationalTasks",
+      "title": "Operational task deleted",
+      "description": "Inspect Truck BW-104",
+      "entityId": 1,
+      "createdAt": "2026-07-21T16:54:04.555Z"
+    },
+    {
+      "id": "6ed97907-eb35-4a1e-b76f-b8cdc6dd6577",
+      "type": "fleet",
+      "title": "Vehicle deleted",
+      "description": "Van 12",
+      "entityId": 3,
+      "createdAt": "2026-07-21T16:54:04.554Z"
+    },
+    {
+      "id": "f8f8209d-4741-4590-9c45-2bafbf08a457",
+      "type": "fleet",
+      "title": "Vehicle deleted",
+      "description": "Truck 08",
+      "entityId": 2,
+      "createdAt": "2026-07-21T16:54:04.554Z"
+    },
+    {
+      "id": "a8cc15e7-1d3c-4034-b9ef-7d29365c9a5e",
+      "type": "fleet",
+      "title": "Vehicle deleted",
+      "description": "Truck BW-104",
+      "entityId": 1,
+      "createdAt": "2026-07-21T16:54:04.552Z"
+    },
     {
       "id": "activity-1",
       "type": "invoice",
@@ -127,5 +1097,21 @@
       "description": "Invoice created for Alpha Industries",
       "createdAt": "2026-07-20T08:00:00.000Z"
     }
-  ]
+  ],
+  "users": [
+    {
+      "id": "64efc35a-217d-48af-890b-1b2b196ae2d2",
+      "email": "ofirkrichman@gmail.com",
+      "name": "ofir krich",
+      "role": "Finance",
+      "active": true,
+      "workspaceId": "workspace-local",
+      "passwordHash": "c66bf42f78766a1a1e010dc3e25f8f34:434d651b0633f343b930db9ef6a641d88935687ed7d8b20288634c2b99b83aa3e66c55d986694bc74454af30c8346d5d34e7fb2bbdeaea83c6c3ebc329e4f7c1",
+      "createdAt": "2026-07-22T18:39:21.740Z"
+    }
+  ],
+  "_meta": {
+    "revision": 8,
+    "updatedAt": "2026-07-22T18:40:06.819Z"
+  }
 }

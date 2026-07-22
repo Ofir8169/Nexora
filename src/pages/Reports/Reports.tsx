@@ -1,5 +1,4 @@
 import {
-  AlertTriangle,
   Bot,
   CheckCircle2,
   Download,
@@ -8,16 +7,42 @@ import {
   Truck,
   Users,
 } from "lucide-react";
-import { useApp } from "../../context/AppContext";
+import { jsPDF } from "jspdf";
+import { toast } from "sonner";
+import { useApp } from "../../context/app-context";
+import { useBusiness } from "../../business/context/business-context";
 
 export default function Reports() {
   const { tasks, fleet, sites, employees } = useApp();
+  const { dashboard: business } = useBusiness();
 
   const completed = tasks.filter((t) => t.status === "Done").length;
   const open = tasks.filter((t) => t.status !== "Done").length;
   const criticalVehicles = fleet.filter((v) => v.status === "Critical").length;
   const highRiskSites = sites.filter((s) => s.risk >= 70).length;
   const overloadedEmployees = employees.filter((e) => e.workload >= 80).length;
+
+  function exportPdf() {
+    const document = new jsPDF();
+    const lines = [
+      `Generated: ${new Date().toLocaleString()}`,
+      `Operational tasks: ${tasks.length} (${open} open, ${completed} completed)`,
+      `Fleet: ${fleet.length} (${criticalVehicles} critical)`,
+      `Sites: ${sites.length} (${highRiskSites} high risk)`,
+      `Employees: ${employees.length} (${overloadedEmployees} overloaded)`,
+      `Customers: ${business?.customers.total ?? 0}`,
+      `Outstanding revenue: ILS ${business?.finance.outstandingRevenue ?? 0}`,
+      `Expenses: ILS ${business?.finance.totalExpenses ?? 0}`,
+      `Profit: ILS ${business?.finance.profit ?? 0}`,
+    ];
+
+    document.setFontSize(20);
+    document.text("Nexora Operations Report", 20, 22);
+    document.setFontSize(11);
+    lines.forEach((line, index) => document.text(line, 20, 38 + index * 9));
+    document.save(`nexora-report-${new Date().toISOString().slice(0, 10)}.pdf`);
+    toast.success("PDF report exported");
+  }
 
   return (
     <div className="pb-10 text-white">
@@ -34,7 +59,7 @@ export default function Reports() {
           </p>
         </div>
 
-        <button className="flex items-center gap-2 rounded-2xl bg-gradient-to-r from-blue-600 to-purple-600 px-5 py-3 text-sm font-black text-white shadow-xl shadow-blue-500/20">
+        <button onClick={exportPdf} className="flex items-center gap-2 rounded-2xl bg-gradient-to-r from-blue-600 to-purple-600 px-5 py-3 text-sm font-black text-white shadow-xl shadow-blue-500/20">
           <Download size={18} />
           Export PDF
         </button>

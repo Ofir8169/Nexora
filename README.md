@@ -1,75 +1,85 @@
-# React + TypeScript + Vite
+# Nexora Operations & Business OS
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Unified operations workspace for tasks, fleet, sites, employees, customers,
+invoices, expenses, reports and AI-assisted decisions.
 
-Currently, two official plugins are available:
+## Included workspace tools
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+- Customizable dashboard widgets and live smart alerts.
+- Customer 360° with related tasks, invoices and documents.
+- Drag-and-drop business task Kanban.
+- Document center with customer linking and file storage up to 5 MB.
+- Monthly calendar for tasks, invoices and expenses.
+- AI daily briefs, customer-message drafts and approved task creation.
+- Global search across operations, customers, invoices and documents.
+- Active invoice follow-up automations and audit history.
+- First-run onboarding and downloadable JSON backups.
+- Role-focused `My Workday` flow for field teams, including service status,
+  navigation, completion photos and performer confirmation.
+- Team accounts with salted password hashes and server-enforced permissions.
+- Accessibility controls for text size, contrast and reduced motion.
+- Installable PWA shell with safe partial offline access.
+- Trial and plan preview for product packaging; external billing remains disabled
+  until a payment provider is connected.
 
-## React Compiler
+## Start the workspace
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
-
-## Expanding the ESLint configuration
-
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
-
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
-
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-
+```bash
+npm install
+npm run dev
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+One command starts both Vite and the local API. Open the URL printed by Vite.
+Operational and business records are stored in `server/data/database.json`.
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+For the most stable single-server mode, use:
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-
+```bash
+npm run serve
 ```
+
+Then open `http://127.0.0.1:4000`. Express serves the production build and API
+from the same origin, without the Vite development proxy.
+
+The local development login is `ofir@nexora.ai` with password `nexora-demo`.
+Before exposing the server, change `NEXORA_ADMIN_EMAIL`,
+`NEXORA_ADMIN_PASSWORD` and `NEXORA_AUTH_SECRET` in `.env`. API requests use a
+signed, expiring server token and expired sessions return to the login screen.
+The login screen also supports rate-limited recovery requests. In local mode,
+rotate the administrator password with `NEXORA_ADMIN_PASSWORD` and restart the
+server after receiving a recovery request.
+
+## Optional cloud AI
+
+Nexora always includes a deterministic local AI fallback. To enable OpenAI,
+copy `.env.example` to `.env` and provide a server-side key:
+
+```bash
+cp .env.example .env
+```
+
+Then set `OPENAI_API_KEY` in `.env` and restart `npm run dev`. The key is read
+only by the server and is never included in the browser bundle.
+
+## Access roles
+
+- `Admin`: all modules and settings.
+- `Manager`: all operational and business modules.
+- `Finance`: dashboard, Business, reports, AI and personal settings.
+- `Operator`: operational modules and AI.
+
+Role and English/Hebrew direction can be selected at login or in Settings.
+The server, rather than the browser, is the source of truth for a signed-in
+user's role. Operators can access operational work only, while finance users
+are blocked from operational and team-management endpoints.
+
+## Verification
+
+```bash
+npm run lint
+npm run build
+npm run test:smoke
+```
+
+The smoke check verifies authentication, operational and business APIs, and
+the main SPA routes against the running local server.

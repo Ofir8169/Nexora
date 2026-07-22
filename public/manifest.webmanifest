@@ -1,0 +1,14 @@
+{
+  "name": "Nexora Service OS",
+  "short_name": "Nexora",
+  "description": "Customers, service calls, field teams and business operations in one accessible workspace.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#f6f8fc",
+  "theme_color": "#2563eb",
+  "lang": "he",
+  "dir": "rtl",
+  "icons": [
+    { "src": "/favicon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any maskable" }
+  ]
+}

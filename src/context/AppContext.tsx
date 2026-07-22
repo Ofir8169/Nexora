@@ -1,204 +1,191 @@
-import { createContext, useContext, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
+import { toast } from "sonner";
 
-import { tasks as initialTasks } from "../data/tasks";
-import { fleet as initialFleet } from "../data/fleet";
 import { employees as initialEmployees } from "../data/employees";
-import { createNotification } from "../services/notificationService";
-import { sites as initialSites } from "../data/sites";
+import { fleet as initialFleet } from "../data/fleet";
 import { notifications as initialNotifications } from "../data/notifications";
+import { sites as initialSites } from "../data/sites";
+import { tasks as initialTasks } from "../data/tasks";
+import { createNotification } from "../services/notificationService";
+import { opsApi } from "../services/opsApi";
+import { AppContext } from "./app-context";
+import { getLocale, localized } from "../lib/preferences";
 
-type Task = (typeof initialTasks)[0];
-type Vehicle = (typeof initialFleet)[0];
-type Employee = (typeof initialEmployees)[0];
-type Site = (typeof initialSites)[0];
-type Notification = (typeof initialNotifications)[0];
-
-type AppContextType = {
-  tasks: Task[];
-  fleet: Vehicle[];
-  employees: Employee[];
-  sites: Site[];
-  notifications: Notification[];
-
-  addTask: (task: Task) => void;
-  updateTask: (task: Task) => void;
-  deleteTask: (id: number) => void;
-  completeTask: (id: number) => void;
-
-  addVehicle: (vehicle: Vehicle) => void;
-  updateVehicle: (vehicle: Vehicle) => void;
-  deleteVehicle: (id: number) => void;
-
-  addEmployee: (employee: Employee) => void;
-  updateEmployee: (employee: Employee) => void;
-  deleteEmployee: (id: number) => void;
-
-  addSite: (site: Site) => void;
-  updateSite: (site: Site) => void;
-  deleteSite: (id: number) => void;
-
-  resetDemoData: () => void;
-};
-
-const AppContext = createContext<AppContextType | null>(null);
-
-function loadFromStorage<T>(key: string, fallback: T): T {
-  const saved = localStorage.getItem(key);
-  return saved ? JSON.parse(saved) : fallback;
-}
+type Task = (typeof initialTasks)[number];
+type Vehicle = (typeof initialFleet)[number];
+type Employee = (typeof initialEmployees)[number];
+type Site = (typeof initialSites)[number];
+type Notification = (typeof initialNotifications)[number];
 
 export function AppProvider({ children }: { children: React.ReactNode }) {
-  const [tasks, setTasks] = useState<Task[]>(() =>
-    loadFromStorage("opsflow_tasks", initialTasks)
-  );
-
-  const [fleet, setFleet] = useState<Vehicle[]>(() =>
-    loadFromStorage("opsflow_fleet", initialFleet)
-  );
-
-  const [employees, setEmployees] = useState<Employee[]>(() =>
-    loadFromStorage("opsflow_employees", initialEmployees)
-  );
-
-  const [sites, setSites] = useState<Site[]>(() =>
-    loadFromStorage("opsflow_sites", initialSites)
-  );
-
+  const locale = getLocale();
+  const t = (en: string, he: string) => localized(en, he, locale);
+  const [tasks, setTasks] = useState<Task[]>(initialTasks);
+  const [fleet, setFleet] = useState<Vehicle[]>(initialFleet);
+  const [employees, setEmployees] = useState<Employee[]>(initialEmployees);
+  const [sites, setSites] = useState<Site[]>(initialSites);
   const [notifications] = useState<Notification[]>(initialNotifications);
 
   useEffect(() => {
-    localStorage.setItem("opsflow_tasks", JSON.stringify(tasks));
-  }, [tasks]);
+    let cancelled = false;
 
-  useEffect(() => {
-    localStorage.setItem("opsflow_fleet", JSON.stringify(fleet));
-  }, [fleet]);
+    void Promise.all([
+      opsApi.tasks.list(),
+      opsApi.fleet.list(),
+      opsApi.employees.list(),
+      opsApi.sites.list(),
+    ])
+      .then(([taskData, fleetData, employeeData, siteData]) => {
+        if (cancelled) return;
+        setTasks(taskData);
+        setFleet(fleetData);
+        setEmployees(employeeData);
+        setSites(siteData);
+      })
+      .catch(() => {
+        toast.warning("Using offline operations data", {
+          description: "Start the workspace with npm run dev to enable syncing.",
+        });
+      });
 
-  useEffect(() => {
-    localStorage.setItem("opsflow_employees", JSON.stringify(employees));
-  }, [employees]);
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
-  useEffect(() => {
-    localStorage.setItem("opsflow_sites", JSON.stringify(sites));
-  }, [sites]);
+  function persist(operation: Promise<unknown>) {
+    void operation.catch((error: unknown) => {
+      toast.error("Could not sync with the server", {
+        description: error instanceof Error ? error.message : "Unknown error",
+      });
+    });
+  }
 
   function addTask(task: Task) {
-  setTasks((prev) => [...prev, task]);
-  createNotification(`Task "${task.title}" created`, "success");
-}
+    setTasks((current) => [...current, task]);
+    persist(opsApi.tasks.create(task));
+    createNotification(`Task "${task.title}" created`, "success");
+    toast.success("Task created", { description: task.title });
+  }
 
-function updateTask(task: Task) {
-  setTasks((prev) => prev.map((item) => (item.id === task.id ? task : item)));
-  createNotification(`Task "${task.title}" updated`, "success");
-}
+  function updateTask(task: Task) {
+    setTasks((current) => current.map((item) => (item.id === task.id ? task : item)));
+    persist(opsApi.tasks.update(task));
+    createNotification(`Task "${task.title}" updated`, "success");
+    toast.success("Task updated", { description: task.title });
+  }
 
-function deleteTask(id: number) {
-  const taskToDelete = tasks.find((task) => task.id === id);
+  function deleteTask(id: number) {
+    const item = tasks.find((task) => task.id === id);
+    setTasks((current) => current.filter((task) => task.id !== id));
+    persist(opsApi.tasks.remove(id));
+    createNotification(item ? `Task "${item.title}" deleted` : "Task deleted", "warning");
+    toast.success(t("Task deleted", "המשימה נמחקה"), item ? {
+      action: {
+        label: t("Undo", "ביטול"),
+        onClick: () => {
+          setTasks((current) => current.some((task) => task.id === item.id) ? current : [...current, item]);
+          persist(opsApi.tasks.create(item));
+          toast.success(t("Task restored", "המשימה שוחזרה"));
+        },
+      },
+    } : undefined);
+  }
 
-  setTasks((prev) => prev.filter((task) => task.id !== id));
+  function completeTask(id: number) {
+    const item = tasks.find((task) => task.id === id);
+    if (!item) return;
+    const completed = { ...item, status: "Done" };
+    setTasks((current) => current.map((task) => (task.id === id ? completed : task)));
+    persist(opsApi.tasks.update(completed));
+    createNotification(`Task "${item.title}" completed`, "success");
+    toast.success("Task completed");
+  }
 
-  createNotification(
-    taskToDelete ? `Task "${taskToDelete.title}" deleted` : "Task deleted",
-    "warning"
-  );
-}
-
-function completeTask(id: number) {
-  const taskToComplete = tasks.find((task) => task.id === id);
-
-  setTasks((prev) =>
-    prev.map((task) => (task.id === id ? { ...task, status: "Done" } : task))
-  );
-
-  createNotification(
-    taskToComplete
-      ? `Task "${taskToComplete.title}" completed`
-      : "Task completed",
-    "success"
-  );
-}
   function addVehicle(vehicle: Vehicle) {
-  setFleet((prev) => [...prev, vehicle]);
-  createNotification(`Vehicle "${vehicle.name}" created`, "success");
-}
+    setFleet((current) => [...current, vehicle]);
+    persist(opsApi.fleet.create(vehicle));
+    createNotification(`Vehicle "${vehicle.name}" created`, "success");
+    toast.success("Vehicle created", { description: vehicle.name });
+  }
 
-function updateVehicle(vehicle: Vehicle) {
-  setFleet((prev) =>
-    prev.map((item) => (item.id === vehicle.id ? vehicle : item))
-  );
-  createNotification(`Vehicle "${vehicle.name}" updated`, "success");
-}
+  function updateVehicle(vehicle: Vehicle) {
+    setFleet((current) => current.map((item) => (item.id === vehicle.id ? vehicle : item)));
+    persist(opsApi.fleet.update(vehicle));
+    toast.success("Vehicle updated", { description: vehicle.name });
+  }
 
-function deleteVehicle(id: number) {
-  const vehicleToDelete = fleet.find((vehicle) => vehicle.id === id);
+  function deleteVehicle(id: number) {
+    const item = fleet.find((vehicle) => vehicle.id === id);
+    setFleet((current) => current.filter((vehicle) => vehicle.id !== id));
+    persist(opsApi.fleet.remove(id));
+    toast.success(t("Vehicle deleted", "הרכב נמחק"), item ? { action: { label: t("Undo", "ביטול"), onClick: () => {
+      setFleet((current) => current.some((vehicle) => vehicle.id === item.id) ? current : [...current, item]);
+      persist(opsApi.fleet.create(item));
+      toast.success(t("Vehicle restored", "הרכב שוחזר"));
+    } } } : undefined);
+  }
 
-  setFleet((prev) => prev.filter((vehicle) => vehicle.id !== id));
+  function addEmployee(employee: Employee) {
+    setEmployees((current) => [...current, employee]);
+    persist(opsApi.employees.create(employee));
+    toast.success("Employee created", { description: employee.name });
+  }
 
-  createNotification(
-    vehicleToDelete
-      ? `Vehicle "${vehicleToDelete.name}" deleted`
-      : "Vehicle deleted",
-    "warning"
-  );
-}
+  function updateEmployee(employee: Employee) {
+    setEmployees((current) => current.map((item) => (item.id === employee.id ? employee : item)));
+    persist(opsApi.employees.update(employee));
+    toast.success("Employee updated", { description: employee.name });
+  }
 
- function addEmployee(employee: Employee) {
-  setEmployees((prev) => [...prev, employee]);
-  createNotification(`Employee "${employee.name}" created`, "success");
-}
+  function deleteEmployee(id: number) {
+    const item = employees.find((employee) => employee.id === id);
+    setEmployees((current) => current.filter((employee) => employee.id !== id));
+    persist(opsApi.employees.remove(id));
+    toast.success(t("Employee deleted", "העובד נמחק"), item ? { action: { label: t("Undo", "ביטול"), onClick: () => {
+      setEmployees((current) => current.some((employee) => employee.id === item.id) ? current : [...current, item]);
+      persist(opsApi.employees.create(item));
+      toast.success(t("Employee restored", "העובד שוחזר"));
+    } } } : undefined);
+  }
 
-function updateEmployee(employee: Employee) {
-  setEmployees((prev) =>
-    prev.map((item) => (item.id === employee.id ? employee : item))
-  );
-  createNotification(`Employee "${employee.name}" updated`, "success");
-}
+  function addSite(site: Site) {
+    setSites((current) => [...current, site]);
+    persist(opsApi.sites.create(site));
+    toast.success("Site created", { description: site.name });
+  }
 
-function deleteEmployee(id: number) {
-  const employeeToDelete = employees.find((employee) => employee.id === id);
+  function updateSite(site: Site) {
+    setSites((current) => current.map((item) => (item.id === site.id ? site : item)));
+    persist(opsApi.sites.update(site));
+    toast.success("Site updated", { description: site.name });
+  }
 
-  setEmployees((prev) => prev.filter((employee) => employee.id !== id));
-
-  createNotification(
-    employeeToDelete
-      ? `Employee "${employeeToDelete.name}" deleted`
-      : "Employee deleted",
-    "warning"
-  );
-}
-
- function addSite(site: Site) {
-  setSites((prev) => [...prev, site]);
-  createNotification(`Site "${site.name}" created`, "success");
-}
-
-function updateSite(site: Site) {
-  setSites((prev) => prev.map((item) => (item.id === site.id ? site : item)));
-  createNotification(`Site "${site.name}" updated`, "success");
-}
-
-function deleteSite(id: number) {
-  const siteToDelete = sites.find((site) => site.id === id);
-
-  setSites((prev) => prev.filter((site) => site.id !== id));
-
-  createNotification(
-    siteToDelete ? `Site "${siteToDelete.name}" deleted` : "Site deleted",
-    "warning"
-  );
-}
+  function deleteSite(id: number) {
+    const item = sites.find((site) => site.id === id);
+    setSites((current) => current.filter((site) => site.id !== id));
+    persist(opsApi.sites.remove(id));
+    toast.success(t("Site deleted", "האתר נמחק"), item ? { action: { label: t("Undo", "ביטול"), onClick: () => {
+      setSites((current) => current.some((site) => site.id === item.id) ? current : [...current, item]);
+      persist(opsApi.sites.create(item));
+      toast.success(t("Site restored", "האתר שוחזר"));
+    } } } : undefined);
+  }
 
   function resetDemoData() {
-    localStorage.removeItem("opsflow_tasks");
-    localStorage.removeItem("opsflow_fleet");
-    localStorage.removeItem("opsflow_employees");
-    localStorage.removeItem("opsflow_notifications");
-    localStorage.removeItem("opsflow_sites");
-
     setTasks(initialTasks);
     setFleet(initialFleet);
     setEmployees(initialEmployees);
     setSites(initialSites);
+    persist(
+      Promise.all([
+        opsApi.tasks.replaceAll(initialTasks),
+        opsApi.fleet.replaceAll(initialFleet),
+        opsApi.employees.replaceAll(initialEmployees),
+        opsApi.sites.replaceAll(initialSites),
+      ])
+    );
+    toast.success("Demo data restored");
   }
 
   return (
@@ -209,38 +196,23 @@ function deleteSite(id: number) {
         employees,
         sites,
         notifications,
-
         addTask,
         updateTask,
         deleteTask,
         completeTask,
-
         addVehicle,
         updateVehicle,
         deleteVehicle,
-
         addEmployee,
         updateEmployee,
         deleteEmployee,
-
         addSite,
         updateSite,
         deleteSite,
-
         resetDemoData,
       }}
     >
       {children}
     </AppContext.Provider>
   );
-}
-
-export function useApp() {
-  const context = useContext(AppContext);
-
-  if (!context) {
-    throw new Error("useApp must be used inside AppProvider");
-  }
-
-  return context;
 }

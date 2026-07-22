@@ -83,6 +83,7 @@ export interface BusinessTask {
   dueDate: string;
   createdAt: string;
   updatedAt?: string;
+  invoiceId?: string;
 }
 
 export interface InvoiceItem {
@@ -109,6 +110,7 @@ export interface Invoice {
   notes?: string;
   createdAt: string;
   updatedAt?: string;
+  sourceTaskId?: string;
 }
 
 export interface Expense {
@@ -148,6 +150,10 @@ export interface Automation {
   lastRun: string | null;
   createdAt: string;
   updatedAt?: string;
+  lastResult?: {
+    createdTasks: number;
+    checkedAt: string;
+  };
 }
 
 export interface Activity {

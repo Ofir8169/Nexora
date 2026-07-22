@@ -8,9 +8,11 @@ import {
   Truck,
   Users,
 } from "lucide-react";
-import { useApp } from "../../context/AppContext";
+import { useNavigate } from "react-router-dom";
+import { useApp } from "../../context/app-context";
 
 export default function CommandCenter() {
+  const navigate = useNavigate();
   const { tasks, fleet, employees, sites, notifications } = useApp();
 
   const openTasks = tasks.filter((task) => task.status !== "Done").length;
@@ -141,7 +143,11 @@ export default function CommandCenter() {
             />
           </div>
 
-          <button className="mt-6 w-full rounded-2xl bg-gradient-to-r from-blue-600 to-purple-600 py-4 text-sm font-black text-white shadow-xl shadow-blue-500/20">
+          <button
+            type="button"
+            onClick={() => navigate("/ai", { state: { prompt: "Analyze current operation readiness" } })}
+            className="mt-6 w-full rounded-2xl bg-gradient-to-r from-blue-600 to-purple-600 py-4 text-sm font-black text-white shadow-xl shadow-blue-500/20"
+          >
             ✦ Analyze Operation
           </button>
         </Panel>

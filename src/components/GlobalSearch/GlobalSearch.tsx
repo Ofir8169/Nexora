@@ -1,14 +1,39 @@
-import { useMemo, useState } from "react";
-import { ClipboardList, MapPin, Search, Truck, User, X } from "lucide-react";
+import { useCallback, useMemo, useState } from "react";
+import { BriefcaseBusiness, ClipboardList, FileText, FolderOpen, History, MapPin, Receipt, Search, Trash2, Truck, User, X } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-import { useApp } from "../../context/AppContext";
+import { useApp } from "../../context/app-context";
+import { useBusiness } from "../../business/context/business-context";
+import { getLocale, localized } from "../../lib/preferences";
+
+type RecentResult = {
+  id: string;
+  type: string;
+  title: string;
+  subtitle: string;
+  path: string;
+  entityId?: string | number;
+};
 
 export default function GlobalSearch() {
+  const locale = getLocale();
+  const t = useCallback((en: string, he: string) => localized(en, he, locale), [locale]);
   const { tasks, fleet, sites, employees } = useApp();
+  const business = useBusiness();
   const navigate = useNavigate();
 
   const [query, setQuery] = useState("");
   const [open, setOpen] = useState(false);
+  const [recent, setRecent] = useState<RecentResult[]>(() => {
+    try {
+      const parsed: unknown = JSON.parse(localStorage.getItem("nexora_recent_searches") ?? "[]");
+      if (!Array.isArray(parsed)) return [];
+      return parsed.filter((item): item is RecentResult => Boolean(
+        item && typeof item === "object" && "id" in item && "title" in item && "path" in item
+      )).slice(0, 5);
+    } catch {
+      return [];
+    }
+  });
 
   const results = useMemo(() => {
     const q = query.toLowerCase().trim();
@@ -23,10 +48,11 @@ export default function GlobalSearch() {
       )
       .map((item) => ({
         id: `task-${item.id}`,
-        type: "Task",
+        type: t("Task", "משימה"),
         title: item.title,
         subtitle: `${item.site} • ${item.status}`,
         path: "/tasks",
+        entityId: item.id,
         icon: ClipboardList,
       }));
 
@@ -38,10 +64,11 @@ export default function GlobalSearch() {
       )
       .map((item) => ({
         id: `fleet-${item.id}`,
-        type: "Vehicle",
+        type: t("Vehicle", "רכב"),
         title: item.name,
         subtitle: `${item.site} • ${item.status}`,
         path: "/fleet",
+        entityId: item.id,
         icon: Truck,
       }));
 
@@ -51,10 +78,11 @@ export default function GlobalSearch() {
       )
       .map((item) => ({
         id: `site-${item.id}`,
-        type: "Site",
+        type: t("Site", "אתר"),
         title: item.name,
         subtitle: `${item.status} • ${item.risk}% risk`,
         path: "/sites",
+        entityId: item.id,
         icon: MapPin,
       }));
 
@@ -66,31 +94,64 @@ export default function GlobalSearch() {
       )
       .map((item) => ({
         id: `employee-${item.id}`,
-        type: "Employee",
+        type: t("Employee", "עובד"),
         title: item.name,
         subtitle: `${item.role} • ${item.status}`,
         path: "/employees",
+        entityId: item.id,
         icon: User,
       }));
+
+    const customerResults = business.customers.filter((item) =>
+      `${item.name} ${item.company} ${item.email} ${item.phone}`.toLowerCase().includes(q)
+    ).map((item) => ({ id: `customer-${item.id}`, type: t("Customer", "לקוח"), title: item.name, subtitle: `${item.company} • ${item.status}`, path: "/business", entityId: item.id, icon: BriefcaseBusiness }));
+
+    const businessTaskResults = business.tasks.filter((item) =>
+      `${item.title} ${item.description} ${item.status}`.toLowerCase().includes(q)
+    ).map((item) => ({ id: `business-task-${item.id}`, type: t("Business task", "משימה עסקית"), title: item.title, subtitle: `${item.status} • ${t("Score", "ציון")} ${item.priorityScore}`, path: "/business", entityId: item.id, icon: FileText }));
+
+    const invoiceResults = business.invoices.filter((item) =>
+      `${item.documentNumber} ${item.status} ${item.notes ?? ""}`.toLowerCase().includes(q)
+    ).map((item) => ({ id: `invoice-${item.id}`, type: t("Invoice", "חשבונית"), title: item.documentNumber, subtitle: `${item.status} • ${formatCurrency(item.total)}`, path: "/business", entityId: item.id, icon: Receipt }));
+
+    const documentResults = business.documents.filter((item) =>
+      `${item.name} ${item.type} ${item.fileName ?? ""}`.toLowerCase().includes(q)
+    ).map((item) => ({ id: `document-${item.id}`, type: t("Document", "מסמך"), title: item.name, subtitle: item.type, path: "/business", entityId: item.id, icon: FolderOpen }));
 
     return [
       ...taskResults,
       ...fleetResults,
       ...siteResults,
       ...employeeResults,
-    ].slice(0, 8);
-  }, [query, tasks, fleet, sites, employees]);
+      ...customerResults,
+      ...businessTaskResults,
+      ...invoiceResults,
+      ...documentResults,
+    ].slice(0, 10);
+  }, [query, tasks, fleet, sites, employees, business.customers, business.tasks, business.invoices, business.documents, t]);
 
-  function openResult(path: string) {
-    navigate(path);
+  function openResult(result: RecentResult) {
+    const view = result.id.startsWith("customer-")
+      ? "customers"
+      : result.id.startsWith("business-task-")
+        ? "tasks"
+        : result.id.startsWith("invoice-")
+          ? "finance"
+          : result.id.startsWith("document-")
+            ? "documents"
+            : undefined;
+    navigate(result.path, { state: { selectedId: result.entityId, view, resultType: result.id.split("-")[0] } });
+    const nextRecent = [result, ...recent.filter((item) => item.id !== result.id)].slice(0, 5);
+    setRecent(nextRecent);
+    localStorage.setItem("nexora_recent_searches", JSON.stringify(nextRecent));
     setQuery("");
     setOpen(false);
   }
 
   return (
-    <div className="relative w-full max-w-xl">
-      <div className="flex items-center gap-3 rounded-2xl border border-white/10 bg-slate-900 px-4 py-3">
-        <Search size={18} className="text-cyan-400" />
+    <div className="relative w-full">
+      <div className="flex min-h-11 items-center gap-3 rounded-xl border border-slate-200 bg-slate-50 px-3.5 transition focus-within:border-blue-300 focus-within:bg-white focus-within:ring-4 focus-within:ring-blue-50">
+        <Search size={17} className="shrink-0 text-slate-400" />
 
         <input
           value={query}
@@ -99,8 +160,8 @@ export default function GlobalSearch() {
             setQuery(e.target.value);
             setOpen(true);
           }}
-          placeholder="Search operations..."
-          className="w-full bg-transparent text-sm text-white outline-none placeholder:text-slate-500"
+          placeholder={t("Search everything...", "חיפוש משימות, לקוחות, רכבים ומסמכים...")}
+          className="w-full bg-transparent text-sm text-slate-800 outline-none placeholder:text-slate-400"
         />
 
         {query && (
@@ -109,18 +170,34 @@ export default function GlobalSearch() {
               setQuery("");
               setOpen(false);
             }}
-            className="text-slate-500 hover:text-white"
+            aria-label={t("Clear search", "נקה חיפוש")}
+            className="rounded-lg p-1 text-slate-400 hover:bg-slate-100 hover:text-slate-700"
           >
             <X size={16} />
           </button>
         )}
       </div>
 
-      {open && query && (
-        <div className="absolute left-0 top-14 z-50 w-full rounded-3xl border border-blue-400/30 bg-slate-900 p-3 shadow-2xl shadow-blue-500/20">
-          {results.length === 0 ? (
-            <div className="rounded-2xl bg-slate-950/70 p-4 text-sm text-slate-400">
-              No results found.
+      {open && (query || recent.length > 0) && (
+        <div className="absolute left-0 top-13 z-50 w-full overflow-hidden rounded-2xl border border-slate-200 bg-white p-2 shadow-xl shadow-slate-900/10">
+          {!query ? (
+            <div>
+              <div className="flex items-center justify-between px-2 py-2">
+                <p className="flex items-center gap-2 text-xs font-semibold text-slate-500"><History size={14} /> {t("Recently viewed", "נצפו לאחרונה")}</p>
+                <button type="button" onClick={() => { setRecent([]); localStorage.removeItem("nexora_recent_searches"); setOpen(false); }} className="flex items-center gap-1 text-xs font-semibold text-slate-400 hover:text-red-600"><Trash2 size={13} /> {t("Clear", "ניקוי")}</button>
+              </div>
+              <div className="space-y-1">
+                {recent.map((result) => (
+                  <button key={result.id} type="button" onClick={() => openResult(result)} className="flex w-full items-center gap-3 rounded-xl p-3 text-left transition hover:bg-slate-50">
+                    <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-violet-50 text-violet-600"><History size={17} /></span>
+                    <span className="min-w-0"><span className="block truncate text-sm font-semibold text-slate-900">{result.title}</span><span className="block truncate text-xs text-slate-500">{result.subtitle}</span></span>
+                  </button>
+                ))}
+              </div>
+            </div>
+          ) : results.length === 0 ? (
+            <div className="rounded-xl bg-slate-50 p-4 text-sm text-slate-500">
+              {t("No results found.", "לא נמצאו תוצאות.")}
             </div>
           ) : (
             <div className="space-y-2">
@@ -130,19 +207,19 @@ export default function GlobalSearch() {
                 return (
                   <button
                     key={result.id}
-                    onClick={() => openResult(result.path)}
-                    className="flex w-full items-center gap-3 rounded-2xl border border-white/10 bg-slate-950/70 p-4 text-left hover:border-cyan-400/40 hover:bg-slate-800"
+                    onClick={() => openResult(result)}
+                    className="flex w-full items-center gap-3 rounded-xl p-3 text-left transition hover:bg-slate-50"
                   >
-                    <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-cyan-500/10 text-cyan-300">
+                    <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-blue-50 text-blue-600">
                       <Icon size={18} />
                     </div>
 
                     <div>
-                      <p className="text-xs font-black uppercase tracking-widest text-cyan-400">
+                      <p className="text-[10px] font-bold uppercase tracking-widest text-blue-600">
                         {result.type}
                       </p>
-                      <p className="font-black text-white">{result.title}</p>
-                      <p className="text-xs text-slate-400">
+                      <p className="font-semibold text-slate-900">{result.title}</p>
+                      <p className="text-xs text-slate-500">
                         {result.subtitle}
                       </p>
                     </div>
@@ -155,4 +232,8 @@ export default function GlobalSearch() {
       )}
     </div>
   );
+}
+
+function formatCurrency(value: number) {
+  return new Intl.NumberFormat("he-IL", { style: "currency", currency: "ILS", maximumFractionDigits: 0 }).format(value);
 }

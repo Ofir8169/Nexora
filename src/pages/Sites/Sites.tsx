@@ -12,13 +12,25 @@ import {
   ClipboardList,
   X,
 } from "lucide-react";
-import { useApp } from "../../context/AppContext";
+import { useApp } from "../../context/app-context";
+import { useLocation } from "react-router-dom";
+import { getLocale, localized } from "../../lib/preferences";
+import EntityActivity from "../../components/ui-v2/EntityActivity";
+import EntityNotes from "../../components/ui-v2/EntityNotes";
 
 export default function Sites() {
+  const locale = getLocale();
+  const t = (en: string, he: string) => localized(en, he, locale);
+  const location = useLocation();
   const { sites, addSite, updateSite, deleteSite } = useApp();
 
-  const [selectedSite, setSelectedSite] = useState(sites[0]);
-  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedSite, setSelectedSite] = useState(() => {
+    const selectedId = Number((location.state as { selectedId?: unknown } | null)?.selectedId);
+    return sites.find((site) => site.id === selectedId) ?? sites[0];
+  });
+  const [isModalOpen, setIsModalOpen] = useState(
+    () => location.state?.quickCreate === "site"
+  );
   const [editingSiteId, setEditingSiteId] = useState<number | null>(null);
   const [search, setSearch] = useState("");
 
@@ -106,13 +118,13 @@ export default function Sites() {
       <div className="mb-8 flex items-start justify-between">
         <div>
           <p className="text-sm font-black uppercase tracking-widest text-cyan-400">
-            Site Operations
+            {t("Site Operations", "ניהול אתרים")}
           </p>
           <h1 className="mt-2 text-5xl font-black tracking-tight text-white">
-            Sites Command
+            {t("Sites Command", "מרכז האתרים")}
           </h1>
           <p className="mt-3 text-lg text-slate-300">
-            Monitor sites, resources, tasks, issues and operational risk.
+            {t("Monitor sites, resources, tasks, issues and operational risk.", "מעקב אחר משאבים, משימות, תקלות וסיכונים בכל אתר.")}
           </p>
         </div>
 
@@ -121,15 +133,15 @@ export default function Sites() {
           className="flex items-center gap-2 rounded-2xl bg-gradient-to-r from-blue-600 to-purple-600 px-5 py-3 text-sm font-black text-white shadow-xl shadow-blue-500/20"
         >
           <Plus size={18} />
-          New Site
+          {t("New Site", "אתר חדש")}
         </button>
       </div>
 
       <div className="grid gap-5 xl:grid-cols-4">
-        <SiteKPI icon={<Building2 />} title="Total Sites" value={sites.length} note="Monitored sites" color="blue" />
-        <SiteKPI icon={<MapPin />} title="Active" value={active} note="Online sites" color="green" />
-        <SiteKPI icon={<AlertTriangle />} title="Maintenance" value={maintenance} note="Needs review" color="orange" />
-        <SiteKPI icon={<AlertTriangle />} title="Critical" value={critical + highRisk} note="High risk" color="red" />
+        <SiteKPI icon={<Building2 />} title={t("Total Sites", "סך אתרים")} value={sites.length} note={t("Monitored sites", "אתרים במעקב")} color="blue" />
+        <SiteKPI icon={<MapPin />} title={t("Active", "פעילים")} value={active} note={t("Online sites", "אתרים מחוברים")} color="green" />
+        <SiteKPI icon={<AlertTriangle />} title={t("Maintenance", "בטיפול")} value={maintenance} note={t("Needs review", "דורשים בדיקה")} color="orange" />
+        <SiteKPI icon={<AlertTriangle />} title={t("Critical", "קריטיים")} value={critical + highRisk} note={t("High risk", "סיכון גבוה")} color="red" />
       </div>
 
       <div className="my-6 flex items-center gap-3 rounded-3xl border border-blue-400/30 bg-slate-900/95 px-5 py-4 shadow-2xl shadow-blue-500/10">
@@ -137,14 +149,14 @@ export default function Sites() {
         <input
           value={search}
           onChange={(e) => setSearch(e.target.value)}
-          placeholder="Search sites or status..."
+          placeholder={t("Search sites or status...", "חיפוש לפי אתר או סטטוס...")}
           className="w-full bg-transparent text-sm text-white outline-none placeholder:text-slate-500"
         />
       </div>
       <div className="grid gap-6 xl:grid-cols-[1fr_430px]">
-        <Panel title="Operational Sites">
+        <Panel title={t("Operational Sites", "אתרים תפעוליים")}>
           {filteredSites.length === 0 ? (
-            <p className="text-sm text-slate-400">No sites found.</p>
+            <p className="text-sm text-slate-400">{t("No sites found.", "לא נמצאו אתרים.")}</p>
           ) : (
             <div className="grid gap-4 md:grid-cols-2">
               {filteredSites.map((site) => (
@@ -162,7 +174,7 @@ export default function Sites() {
                       <div>
                         <p className="font-black text-white">{site.name}</p>
                         <p className="mt-1 text-sm text-slate-400">
-                          Operational Site
+                          {t("Operational Site", "אתר תפעולי")}
                         </p>
                       </div>
                     </div>
@@ -198,7 +210,7 @@ export default function Sites() {
 
                   <div className="mt-5">
                     <div className="mb-2 flex justify-between text-sm">
-                      <span className="text-slate-400">Risk Score</span>
+                      <span className="text-slate-400">{t("Risk Score", "ציון סיכון")}</span>
                       <span className="font-black text-white">
                         {site.risk}%
                       </span>
@@ -224,9 +236,9 @@ export default function Sites() {
         </Panel>
 
         {selectedSite ? (
-          <Panel title="Site Details">
+          <Panel title={t("Site Details", "פרטי אתר")}>
             <p className="text-sm font-black uppercase tracking-widest text-cyan-400">
-              Selected Site
+              {t("Selected Site", "אתר שנבחר")}
             </p>
 
             <h2 className="mt-2 text-3xl font-black text-white">
@@ -267,17 +279,20 @@ export default function Sites() {
             <div className="mt-7 rounded-2xl border border-cyan-400/20 bg-cyan-500/10 p-4">
               <div className="flex items-center gap-2 text-cyan-300">
                 <AlertTriangle size={18} />
-                <p className="text-sm font-black">AI Site Brief</p>
+                <p className="text-sm font-black">{t("AI Site Brief", "סיכום אתר חכם")}</p>
               </div>
 
               <p className="mt-3 text-sm leading-6 text-slate-200">
                 {selectedSite.risk > 70
-                  ? `${selectedSite.name} requires immediate operational review.`
+                  ? t(`${selectedSite.name} requires immediate operational review.`, `${selectedSite.name} דורש בדיקה תפעולית מיידית.`)
                   : selectedSite.issues > 0
-                  ? "Review open issues before the next mission."
-                  : "Site is healthy and mission ready."}
+                  ? t("Review open issues before the next mission.", "יש לבדוק את התקלות הפתוחות לפני הפעילות הבאה.")
+                  : t("Site is healthy and mission ready.", "האתר תקין ומוכן לפעילות.")}
               </p>
             </div>
+
+            <EntityActivity createdLabel={t("Site added to monitoring", "האתר נוסף למעקב")} updatedLabel={t(`Risk updated to ${selectedSite.risk}%`, `הסיכון עודכן ל-${selectedSite.risk}%`)} />
+            <EntityNotes key={`site_${selectedSite.id}`} entityKey={`site_${selectedSite.id}`} />
 
             <div className="mt-7 flex gap-3">
               <button
@@ -285,7 +300,7 @@ export default function Sites() {
                 className="flex items-center gap-2 rounded-2xl bg-slate-800 px-4 py-3 text-sm font-black text-white"
               >
                 <Edit size={16} />
-                Edit
+                {t("Edit", "עריכה")}
               </button>
 
               <button
@@ -293,13 +308,13 @@ export default function Sites() {
                 className="flex items-center gap-2 rounded-2xl bg-red-600 px-4 py-3 text-sm font-black text-white"
               >
                 <Trash2 size={16} />
-                Delete
+                {t("Delete", "מחיקה")}
               </button>
             </div>
           </Panel>
         ) : (
-          <Panel title="Site Details">
-            <p className="text-slate-400">No site selected.</p>
+          <Panel title={t("Site Details", "פרטי אתר")}>
+            <p className="text-slate-400">{t("No site selected.", "לא נבחר אתר.")}</p>
           </Panel>
         )}
       </div>

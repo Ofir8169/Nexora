@@ -15,11 +15,10 @@ import {
 import {
   Activity,
   AlertTriangle,
-  BarChart3,
   CheckCircle2,
   Truck,
 } from "lucide-react";
-import { useApp } from "../../context/AppContext";
+import { useApp } from "../../context/app-context";
 
 export default function Analytics() {
   const { tasks, fleet, employees, sites } = useApp();
